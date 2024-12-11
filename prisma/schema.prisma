@@ -20,3 +20,30 @@ model Dosen {
   phone    String
   whatsapp String
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  name      String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+model Mahasiswa {
+  NIM       Int         @unique
+  name      String
+  phone     String
+  transaksi Transaksi[]
+}
+
+model Transaksi {
+  id            Int       @id @default(autoincrement())
+  NIM_mahasiswa Int
+  mahasiswa     Mahasiswa @relation(fields: [NIM_mahasiswa], references: [NIM])
+  nominal       BigInt
+  type          String //'pemasukan' atau 'pengeluaran'
+  tanggal       DateTime  @default(now())
+  deskripsi     String?
+}
