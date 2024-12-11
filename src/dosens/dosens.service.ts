@@ -8,25 +8,10 @@ export class DosensService {
   constructor(private prismaService: PrismaService) {}
 
   async create(createDosenDto: CreateDosenDto) {
-    const matkul = createDosenDto.matkul;
     try {
-      let dosen = await this.existingDosen(null, matkul);
-      if (dosen) {
-        return new HttpException(
-          {
-            status: 'error',
-            message: 'Mata kuliah sudah terdaftar',
-            error: 'Conflict',
-          },
-          HttpStatus.CONFLICT,
-        );
-      }
-
-      dosen = await this.prismaService.dosen.create({ data: createDosenDto });
-      return {
-        status: 'success',
-        data: dosen,
-      };
+      return await this.prismaService.dosen.create({
+        data: createDosenDto,
+      });
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -41,11 +26,7 @@ export class DosensService {
 
   async findAll() {
     try {
-      const dosens = await this.prismaService.dosen.findMany();
-      return {
-        status: 'success',
-        data: dosens,
-      };
+      return await this.prismaService.dosen.findMany();
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -60,20 +41,7 @@ export class DosensService {
 
   async findOne(id: number) {
     try {
-      const dosen = await this.existingDosen(id);
-      if (!dosen) {
-        return new HttpException(
-          {
-            status: 'error',
-            message: `Dosen dengan ID ${id} tidak ditemukan!`,
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      return {
-        status: 'success',
-        data: dosen,
-      };
+      return await this.existingDosen(id);
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -88,24 +56,10 @@ export class DosensService {
 
   async update(id: number, updateDosenDto: UpdateDosenDto) {
     try {
-      const dosen = await this.existingDosen(id);
-      if (!dosen) {
-        return new HttpException(
-          {
-            status: 'error',
-            message: `Dosen dengan ID ${id} tidak ditemukan!`,
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      const newDosen = await this.prismaService.dosen.update({
+      return await this.prismaService.dosen.update({
         where: { id },
         data: updateDosenDto,
       });
-      return {
-        status: 'success',
-        data: newDosen,
-      };
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -120,22 +74,7 @@ export class DosensService {
 
   async remove(id: number) {
     try {
-      const existDosen = await this.existingDosen(id);
-      if (!existDosen) {
-        return new HttpException(
-          {
-            status: 'error',
-            message: `Dosen dengan ID ${id} tidak ditemukan!`,
-          },
-          HttpStatus.NOT_FOUND,
-        );
-      } else {
-        const dosen = await this.prismaService.dosen.delete({ where: { id } });
-        return {
-          status: 'success',
-          data: dosen,
-        };
-      }
+      return await this.prismaService.dosen.delete({ where: { id } });
     } catch (error) {
       console.log(error);
       throw new HttpException(
