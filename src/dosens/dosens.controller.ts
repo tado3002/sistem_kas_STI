@@ -11,13 +11,13 @@ import {
   HttpCode,
   ParseIntPipe,
   Res,
+  HttpException,
 } from '@nestjs/common';
 import { DosensService } from './dosens.service';
 import { CreateDosenDto } from './dto/create-dosen.dto';
 import { UpdateDosenDto } from './dto/update-dosen.dto';
 import { AdminGuard } from 'src/auth/admin/admin.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { Response } from 'express';
 import { toApiResponse } from 'src/common/interfaces/response.interface';
 
 @Controller('dosens')
@@ -26,21 +26,17 @@ export class DosensController {
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
-  async create(
-    @Body() createDosenDto: CreateDosenDto,
-    @Res() response: Response,
-  ) {
+  async create(@Body() createDosenDto: CreateDosenDto) {
     const matkul = createDosenDto.matkul;
     const dosen = await this.dosensService.existingDosen(null, matkul);
     if (dosen) {
-      return response
-        .status(HttpStatus.CONFLICT)
-        .json(toApiResponse('Matkul telah terdaftar!'));
+      throw new HttpException(
+        toApiResponse('matkul telah ada!'),
+        HttpStatus.CONFLICT,
+      );
     }
     const result = await this.dosensService.create(createDosenDto);
-    return response
-      .status(HttpStatus.OK)
-      .json(toApiResponse('Berhasil menambahkan dosen!', result));
+    return toApiResponse('Berhasil menambahkan dosen!', result);
   }
 
   @Get()
@@ -58,17 +54,15 @@ export class DosensController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
-    @Res() response: Response,
   ) {
     const result = await this.dosensService.findOne(+id);
     if (!result) {
-      return response
-        .status(HttpStatus.NOT_FOUND)
-        .send(toApiResponse('Dosen tidak ditemukan!'));
+      throw new HttpException(
+        toApiResponse('Dosen tidak ditemukan!'),
+        HttpStatus.NOT_FOUND,
+      );
     } else {
-      return response
-        .status(HttpStatus.OK)
-        .send(toApiResponse('Data dosen ditemukan!', result));
+      return toApiResponse('Data dosen ditemukan!', result);
     }
   }
 
@@ -81,18 +75,16 @@ export class DosensController {
     )
     id: number,
     @Body() updateDosenDto: UpdateDosenDto,
-    @Res() response: Response,
   ) {
     const dosen = await this.dosensService.existingDosen(+id);
     if (!dosen) {
-      return response
-        .status(HttpStatus.NOT_FOUND)
-        .send(toApiResponse('Dosen tidak ditemukan!'));
+      throw new HttpException(
+        toApiResponse('Dosen tidak ditemukan!'),
+        HttpStatus.NOT_FOUND,
+      );
     } else {
       const newDosen = await this.dosensService.update(+id, updateDosenDto);
-      return response
-        .status(HttpStatus.OK)
-        .send(toApiResponse('Berhasil update data dosen!', newDosen));
+      return toApiResponse('Data dosen berhasil diupdate!', newDosen);
     }
   }
 
@@ -104,18 +96,16 @@ export class DosensController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
-    @Res() response: Response,
   ) {
     const dosen = await this.dosensService.findOne(+id);
     if (!dosen) {
-      return response
-        .status(HttpStatus.NOT_FOUND)
-        .send(toApiResponse('Dosen tidak ditemukan!'));
+      throw new HttpException(
+        toApiResponse('Dosen tidak ditemukan!'),
+        HttpStatus.NOT_FOUND,
+      );
     } else {
       const result = await this.dosensService.remove(+id);
-      return response
-        .status(HttpStatus.OK)
-        .send(toApiResponse('Berhasil menghapus data dosen!', result));
+      return toApiResponse('Berhasil menghapus data dosen!', result);
     }
   }
 }
