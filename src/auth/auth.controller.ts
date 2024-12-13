@@ -35,7 +35,7 @@ export class AuthController {
         HttpStatus.NOT_FOUND,
       );
     } else {
-      toApiResponse('Berhasil login!', result);
+      return toApiResponse('Berhasil login!', result);
     }
   }
 }
