@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  HttpCode,
   HttpException,
   HttpStatus,
   Post,
@@ -9,37 +8,34 @@ import {
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { toApiResponse } from 'src/common/interfaces/response.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  @HttpCode(201)
   async register(@Body() registerUserDto: RegisterUserDto) {
-    try {
-      await this.authService.register(registerUserDto);
-      return 'success create user!';
-    } catch (error) {
-      console.log(error);
+    const result = await this.authService.register(registerUserDto);
+    if (!result) {
       throw new HttpException(
-        'Internal Server Error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        toApiResponse('Username telah digunakan!'),
+        HttpStatus.CONFLICT,
       );
     }
+    return toApiResponse('Registrasi berhasil!');
   }
+
   @Post('login')
-  @HttpCode(HttpStatus.ACCEPTED)
   async login(@Body() loginUserDto: LoginUserDto) {
-    try {
-      const result = await this.authService.login(loginUserDto);
-      return result;
-    } catch (error) {
-      console.log(error);
-      return new HttpException(
-        'Internal Server Error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+    const result = await this.authService.login(loginUserDto);
+    if (!result.accessToken) {
+      throw new HttpException(
+        toApiResponse('Username atau password salah!', result),
+        HttpStatus.NOT_FOUND,
       );
+    } else {
+      toApiResponse('Berhasil login!', result);
     }
   }
 }

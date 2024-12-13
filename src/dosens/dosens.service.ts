@@ -2,12 +2,13 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateDosenDto } from './dto/create-dosen.dto';
 import { UpdateDosenDto } from './dto/update-dosen.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Dosen } from '@prisma/client';
 
 @Injectable()
 export class DosensService {
   constructor(private prismaService: PrismaService) {}
 
-  async create(createDosenDto: CreateDosenDto) {
+  async create(createDosenDto: CreateDosenDto): Promise<Dosen> {
     try {
       return await this.prismaService.dosen.create({
         data: createDosenDto,
@@ -24,7 +25,7 @@ export class DosensService {
     }
   }
 
-  async findAll() {
+  async findAll(): Promise<Dosen[]> {
     try {
       return await this.prismaService.dosen.findMany();
     } catch (error) {
@@ -39,7 +40,7 @@ export class DosensService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<Dosen> {
     try {
       return await this.existingDosen(id);
     } catch (error) {
@@ -54,7 +55,7 @@ export class DosensService {
     }
   }
 
-  async update(id: number, updateDosenDto: UpdateDosenDto) {
+  async update(id: number, updateDosenDto: UpdateDosenDto): Promise<Dosen> {
     try {
       return await this.prismaService.dosen.update({
         where: { id },
@@ -72,7 +73,7 @@ export class DosensService {
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<Dosen> {
     try {
       return await this.prismaService.dosen.delete({ where: { id } });
     } catch (error) {
@@ -87,7 +88,7 @@ export class DosensService {
     }
   }
 
-  async existingDosen(id?: number, matkul?: string) {
+  async existingDosen(id?: number, matkul?: string): Promise<Dosen> {
     if (id) return await this.prismaService.dosen.findUnique({ where: { id } });
     return await this.prismaService.dosen.findUnique({ where: { matkul } });
   }

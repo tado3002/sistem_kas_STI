@@ -8,20 +8,26 @@ import {
   HttpException,
   HttpStatus,
   UseGuards,
+  HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminGuard } from 'src/auth/admin/admin.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { toApiResponse } from 'src/common/interfaces/response.interface';
 
-@UseGuards(AdminGuard)
 @Controller('users')
+@UseGuards(JwtAuthGuard, AdminGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  findAll() {
+  @HttpCode(HttpStatus.OK)
+  async findAll() {
     try {
-      return this.usersService.findAll();
+      const result = await this.usersService.findAll();
+      return toApiResponse('success!', result);
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -32,16 +38,22 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
     try {
-      const user = await this.usersService.findOne(id);
-      if (!user)
+      const result = await this.usersService.findOne(id);
+      if (!result) {
         throw new HttpException(
-          `user dengan ID ${id} tidak ditemukan!`,
+          toApiResponse(`user dengan ID ${id} tidak ditemukan!`),
           HttpStatus.NOT_FOUND,
         );
-
-      return this.usersService.findOne(+id);
+      }
+      return toApiResponse('success!', result);
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -52,15 +64,25 @@ export class UsersController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     try {
       const user = await this.usersService.findOne(id);
-      if (!user)
+      if (!user) {
         throw new HttpException(
-          `user dengan ID ${id} tidak ditemukan!`,
+          toApiResponse(`user dengan ID ${id} tidak ditemukan!`),
           HttpStatus.NOT_FOUND,
         );
-      return this.usersService.update(+id, updateUserDto);
+      } else {
+        const result = await this.usersService.update(+id, updateUserDto);
+        return toApiResponse('success!', result);
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -71,15 +93,24 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number) {
+  async remove(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ) {
     try {
       const user = await this.usersService.findOne(id);
-      if (!user)
+      if (!user) {
         throw new HttpException(
-          `user dengan ID ${id} tidak ditemukan!`,
+          toApiResponse(`user dengan ID ${id} tidak ditemukan!`),
           HttpStatus.NOT_FOUND,
         );
-      return this.usersService.remove(+id);
+      } else {
+        await this.usersService.remove(+id);
+        return toApiResponse('success!');
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException(
