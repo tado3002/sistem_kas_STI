@@ -56,8 +56,8 @@ Response Body (Success):
         "name" : "m. tado"
         "username" : "tado3923",
         "role" : "admin"
-    "accessToken" : "malasmengoding"
     }
+    "accessToken" : "malasmengoding"
   }
 }
 ```
