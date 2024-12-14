@@ -8,14 +8,25 @@ import {
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { toApiResponse } from 'src/common/interfaces/response.interface';
+import {
+  ApiResponse,
+  toApiResponse,
+} from 'src/common/interfaces/response.interface';
+import {
+  LoginResponse,
+  RegisterResponse,
+  toLoginResponse,
+  toRegisterResponse,
+} from 'src/common/interfaces/auth-response.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() registerUserDto: RegisterUserDto) {
+  async register(
+    @Body() registerUserDto: RegisterUserDto,
+  ): Promise<ApiResponse<RegisterResponse>> {
     const result = await this.authService.register(registerUserDto);
     if (!result) {
       throw new HttpException(
@@ -23,19 +34,25 @@ export class AuthController {
         HttpStatus.CONFLICT,
       );
     }
-    return toApiResponse('Registrasi berhasil!');
+    return toRegisterResponse('Registrasi berhasil!', result);
   }
 
   @Post('login')
-  async login(@Body() loginUserDto: LoginUserDto) {
+  async login(
+    @Body() loginUserDto: LoginUserDto,
+  ): Promise<ApiResponse<LoginResponse>> {
     const result = await this.authService.login(loginUserDto);
     if (!result.accessToken) {
       throw new HttpException(
-        toApiResponse('Username atau password salah!', result),
+        toApiResponse('Username atau password salah!'),
         HttpStatus.NOT_FOUND,
       );
     } else {
-      return toApiResponse('Berhasil login!', result);
+      return toLoginResponse(
+        'Berhasil login!',
+        result.accessToken,
+        result.user,
+      );
     }
   }
 }

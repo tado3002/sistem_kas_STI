@@ -4,8 +4,11 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { UsersService } from 'src/users/users.service';
-import { LoginData } from 'src/common/interfaces/auth-response.interface';
-import { User } from '@prisma/client';
+import {
+  LoginResponse,
+  RegisterResponse,
+} from 'src/common/interfaces/auth-response.interface';
+import { toUserResponse } from 'src/common/interfaces/user-response.interface';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private prismaService: PrismaService,
   ) {}
-  async login(loginUserDto: LoginUserDto): Promise<LoginData> {
+  async login(loginUserDto: LoginUserDto): Promise<LoginResponse> {
     try {
       const user = await this.prismaService.user.findFirst({
         where: {
@@ -25,13 +28,13 @@ export class AuthService {
         },
       });
 
-      if (!user) return { accessToken: null };
+      if (!user) return { accessToken: null, user: null };
 
       const payload = {
         username: user.username,
       };
       const accessToken: string = this.jwtService.sign(payload);
-      return { accessToken };
+      return { accessToken, user: toUserResponse(user) };
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -40,14 +43,18 @@ export class AuthService {
       );
     }
   }
-  async register(registerUserDto: RegisterUserDto): Promise<User | null> {
+  async register(registerUserDto: RegisterUserDto): Promise<RegisterResponse> {
     try {
       const user = await this.usersService.findByUsername(
         registerUserDto.username,
       );
       if (user) return null;
 
-      return await this.usersService.create(registerUserDto);
+      const result = await this.usersService.create(registerUserDto);
+      return {
+        name: result.name,
+        username: result.username,
+      };
     } catch (error) {
       console.log(error);
       throw new HttpException(

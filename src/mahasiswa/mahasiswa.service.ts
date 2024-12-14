@@ -2,11 +2,12 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateMahasiswaDto } from './dto/create-mahasiswa.dto';
 import { UpdateMahasiswaDto } from './dto/update-mahasiswa.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Mahasiswa } from '@prisma/client';
 
 @Injectable()
 export class MahasiswaService {
   constructor(private readonly prismaService: PrismaService) {}
-  async create(createMahasiswaDto: CreateMahasiswaDto) {
+  async create(createMahasiswaDto: CreateMahasiswaDto): Promise<Mahasiswa> {
     try {
       return await this.prismaService.mahasiswa.create({
         data: createMahasiswaDto,
@@ -17,7 +18,7 @@ export class MahasiswaService {
     }
   }
 
-  async findAll() {
+  async findAll(): Promise<Mahasiswa[]> {
     try {
       return await this.prismaService.mahasiswa.findMany();
     } catch (error) {
@@ -26,7 +27,7 @@ export class MahasiswaService {
     }
   }
 
-  async findOne(NIM: number) {
+  async findOne(NIM: number): Promise<Mahasiswa> {
     try {
       return await this.prismaService.mahasiswa.findUnique({ where: { NIM } });
     } catch (error) {
@@ -35,7 +36,10 @@ export class MahasiswaService {
     }
   }
 
-  async update(NIM: number, updateMahasiswaDto: UpdateMahasiswaDto) {
+  async update(
+    NIM: number,
+    updateMahasiswaDto: UpdateMahasiswaDto,
+  ): Promise<Mahasiswa> {
     try {
       return await this.prismaService.mahasiswa.update({
         where: { NIM },
@@ -47,7 +51,7 @@ export class MahasiswaService {
     }
   }
 
-  async remove(NIM: number) {
+  async remove(NIM: number): Promise<Mahasiswa> {
     try {
       return await this.prismaService.mahasiswa.delete({
         where: { NIM },

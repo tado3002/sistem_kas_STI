@@ -10,7 +10,6 @@ import {
   HttpStatus,
   HttpCode,
   ParseIntPipe,
-  Res,
   HttpException,
 } from '@nestjs/common';
 import { DosensService } from './dosens.service';
@@ -18,7 +17,14 @@ import { CreateDosenDto } from './dto/create-dosen.dto';
 import { UpdateDosenDto } from './dto/update-dosen.dto';
 import { AdminGuard } from 'src/auth/admin/admin.guard';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { toApiResponse } from 'src/common/interfaces/response.interface';
+import {
+  ApiResponse,
+  toApiResponse,
+} from 'src/common/interfaces/response.interface';
+import {
+  DosenResponse,
+  toDosenResponse,
+} from 'src/common/interfaces/dosen-response.interface';
 
 @Controller('dosens')
 export class DosensController {
@@ -26,7 +32,9 @@ export class DosensController {
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
-  async create(@Body() createDosenDto: CreateDosenDto) {
+  async create(
+    @Body() createDosenDto: CreateDosenDto,
+  ): Promise<ApiResponse<DosenResponse>> {
     const matkul = createDosenDto.matkul;
     const dosen = await this.dosensService.existingDosen(null, matkul);
     if (dosen) {
@@ -36,14 +44,18 @@ export class DosensController {
       );
     }
     const result = await this.dosensService.create(createDosenDto);
-    return toApiResponse('Berhasil menambahkan dosen!', result);
+    return toApiResponse(
+      'Berhasil menambahkan dosen!',
+      toDosenResponse(result),
+    );
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
-  async findAll() {
+  async findAll(): Promise<ApiResponse<DosenResponse[]>> {
     const dosens = await this.dosensService.findAll();
-    return toApiResponse('OK!', dosens);
+    const data = dosens?.map((dosen) => toDosenResponse(dosen));
+    return toApiResponse('Berhasil mengambil data-data dosen', data);
   }
 
   @Get(':id')
@@ -54,7 +66,7 @@ export class DosensController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
-  ) {
+  ): Promise<ApiResponse<DosenResponse>> {
     const result = await this.dosensService.findOne(+id);
     if (!result) {
       throw new HttpException(
@@ -62,7 +74,7 @@ export class DosensController {
         HttpStatus.NOT_FOUND,
       );
     } else {
-      return toApiResponse('Data dosen ditemukan!', result);
+      return toApiResponse('Data dosen ditemukan!', toDosenResponse(result));
     }
   }
 
@@ -75,7 +87,7 @@ export class DosensController {
     )
     id: number,
     @Body() updateDosenDto: UpdateDosenDto,
-  ) {
+  ): Promise<ApiResponse<DosenResponse>> {
     const dosen = await this.dosensService.existingDosen(+id);
     if (!dosen) {
       throw new HttpException(
@@ -84,7 +96,10 @@ export class DosensController {
       );
     } else {
       const newDosen = await this.dosensService.update(+id, updateDosenDto);
-      return toApiResponse('Data dosen berhasil diupdate!', newDosen);
+      return toApiResponse(
+        'Data dosen berhasil diupdate!',
+        toDosenResponse(newDosen),
+      );
     }
   }
 
@@ -96,7 +111,7 @@ export class DosensController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
-  ) {
+  ): Promise<ApiResponse<DosenResponse>> {
     const dosen = await this.dosensService.findOne(+id);
     if (!dosen) {
       throw new HttpException(
@@ -105,7 +120,10 @@ export class DosensController {
       );
     } else {
       const result = await this.dosensService.remove(+id);
-      return toApiResponse('Berhasil menghapus data dosen!', result);
+      return toApiResponse(
+        'Berhasil menghapus data dosen!',
+        toDosenResponse(result),
+      );
     }
   }
 }
