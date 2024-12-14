@@ -68,6 +68,7 @@ Response Body (Failed):
 {
   "message": "Username atau password salah!",
   "data": {
+    "user": null
     "accessToken": null
   }
 }
