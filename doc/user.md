@@ -40,7 +40,7 @@ Response Body (Failed)
 
 ## Update Users
 
-Endpoint : PUT /users/[current]
+Endpoint : PUT /users/[:id]
 
 Headers :
 
@@ -80,7 +80,7 @@ Response Body (Failed)
 
 ## Delete Users
 
-Endpoint : DELETE /users
+Endpoint : DELETE /users/[:id]
 
 Headers :
 

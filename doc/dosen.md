@@ -62,10 +62,11 @@ Response Body (Success)
 {
     "message" : "Berhasil memperbarui data dosen"
     "data" : {
-        "matkul" : "Algoritma Pemrograman", //opsional
-        "name" : "Pak Rasyid", //opsional
-        "phone":"086482238", //opsional
-        "whatsapp":"linkwatsapp" //opsional
+        "id" : 2,
+        "matkul" : "Algoritma Pemrograman",
+        "name" : "Pak Rasyid",
+        "phone":"086482238",
+        "whatsapp":"linkwatsapp"
     }
 }
 ```
@@ -92,10 +93,11 @@ Response Body (Success)
 {
     "message" : "Berhasil menghapus data dosen!"
     "data" : {
-        "matkul" : "Algoritma Pemrograman", //opsional
-        "name" : "Pak Rasyid", //opsional
-        "phone":"086482238", //opsional
-        "whatsapp":"linkwatsapp" //opsional
+        "id" : "2",
+        "matkul" : "Algoritma Pemrograman",
+        "name" : "Pak Rasyid",
+        "phone":"086482238",
+        "whatsapp":"linkwatsapp"
     }
 }
 ```
