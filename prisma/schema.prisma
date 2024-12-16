@@ -22,13 +22,14 @@ model Dosen {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
+  id        Int       @id @default(autoincrement())
+  username  Int       @unique
   password  String
   name      String
-  role      String   @default("user")
-  createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  role      String    @default("user")
+  mahasiswa Mahasiswa @relation(fields: [username], references: [NIM])
+  createdAt DateTime  @default(now())
+  updateAt  DateTime  @updatedAt
 }
 
 model Mahasiswa {
@@ -36,6 +37,7 @@ model Mahasiswa {
   name      String
   phone     String
   transaksi Transaksi[]
+  User      User?
 }
 
 model Transaksi {
