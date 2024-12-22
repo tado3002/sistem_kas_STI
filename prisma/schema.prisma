@@ -1,4 +1,4 @@
-// This is your Prisma schema file,
+// This is your Prisma scmema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
@@ -22,22 +22,32 @@ model Dosen {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  username  Int       @unique
-  password  String
-  name      String
-  role      String    @default("user")
-  mahasiswa Mahasiswa @relation(fields: [username], references: [NIM])
-  createdAt DateTime  @default(now())
-  updateAt  DateTime  @updatedAt
+  id            Int       @id @default(autoincrement())
+  usernameByNIM Int       @unique
+  password      String
+  name          String
+  role          Role      @default(user)
+  mahasiswa     Mahasiswa @relation(fields: [usernameByNIM, name], references: [NIM, name])
+  createdAt     DateTime  @default(now())
+  updateAt      DateTime  @updatedAt
+
+  @@unique([usernameByNIM, name])
+}
+
+enum Role {
+  user
+  admin
 }
 
 model Mahasiswa {
-  NIM       Int         @unique
-  name      String
-  phone     String
+  NIM   Int    @unique
+  name  String
+  phone String
+
   transaksi Transaksi[]
   User      User?
+
+  @@id([NIM, name])
 }
 
 model Transaksi {
