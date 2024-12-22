@@ -8,8 +8,8 @@ Request Body :
 
 ```json
 {
-  "username": "tado3923",
-  "name": "m. tado"
+  "usernameByNIM": "tado3923",
+  "password": "testing123"
 }
 ```
 
@@ -17,11 +17,7 @@ Response Body (Success):
 
 ```json
 {
-  "message": "Registrasi berhasil!",
-  "data": {
-    "name": "m. tado",
-    "username": "tado3923"
-  }
+  "message": "Registrasi berhasil!"
 }
 ```
 
@@ -41,7 +37,7 @@ Request Body :
 
 ```json
 {
-  "username": "tado3923",
+  "usernameByNIM": "tado3923",
   "password": "testing123"
 }
 ```
@@ -52,12 +48,7 @@ Response Body (Success):
 {
   "message": "Login berhasil!",
   "data": {
-    "user" : {
-        "name" : "m. tado"
-        "username" : "tado3923",
-        "role" : "admin"
-    }
-    "accessToken" : "malasmengoding"
+    "accessToken": "malasmengoding"
   }
 }
 ```
@@ -66,10 +57,6 @@ Response Body (Failed):
 
 ```json
 {
-  "message": "Username atau password salah!",
-  "data": {
-    "user": null
-    "accessToken": null
-  }
+  "message": "Username atau password salah!"
 }
 ```

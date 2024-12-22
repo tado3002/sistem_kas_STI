@@ -62,9 +62,8 @@ Response Body (Success)
 {
     "message" : "Berhasil memperbarui data user"
     "data" : {
-      "id" : 1,
       "name" : "m. tado",
-      "username" : "tado3923",
+      "usernameByNIM" : 32423,
       "role" : "admin"
     }
 }
@@ -93,9 +92,8 @@ Response Body (Success)
     "message" : "Berhasil menghapus data user!"
     "data" :
         {
-            "id" : 1,
             "name" : "m. tado",
-            "username" : "tado3923",
+            "usernameByNIM" : "tado3923",
             "role" : "admin"
         },
 
