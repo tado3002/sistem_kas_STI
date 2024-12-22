@@ -1,24 +1,20 @@
 import { ApiResponse } from './response.interface';
-import { UserResponse } from './user-response.interface';
 
 export interface LoginResponse {
-  accessToken: string | null;
-  user: UserResponse | null;
+  accessToken: string;
 }
 export interface RegisterResponse {
   name: string;
-  username: string;
+  usernameByNIM: number;
 }
 export function toLoginResponse(
   message: string,
   token: string,
-  user: UserResponse,
-): ApiResponse<LoginResponse> {
+): ApiResponse<LoginResponse | null> {
   return {
     message,
     data: {
       accessToken: token,
-      user,
     },
   };
 }
@@ -26,7 +22,7 @@ export function toLoginResponse(
 export function toRegisterResponse(
   message: string,
   register: RegisterResponse,
-): ApiResponse<RegisterResponse> {
+): ApiResponse<RegisterResponse | null> {
   return {
     message,
     data: register,

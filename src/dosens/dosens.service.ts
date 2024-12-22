@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateDosenDto } from './dto/create-dosen.dto';
 import { UpdateDosenDto } from './dto/update-dosen.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { Dosen } from '@prisma/client';
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class DosensService {
@@ -10,9 +10,16 @@ export class DosensService {
 
   async create(createDosenDto: CreateDosenDto): Promise<Dosen> {
     try {
-      return await this.prismaService.dosen.create({
-        data: createDosenDto,
+      const existedDosen = await this.prismaService.dosen.findUnique({
+        where: { matkul: createDosenDto.matkul },
       });
+      if (existedDosen) {
+        return null;
+      } else {
+        return await this.prismaService.dosen.create({
+          data: createDosenDto,
+        });
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -42,7 +49,7 @@ export class DosensService {
 
   async findOne(id: number): Promise<Dosen> {
     try {
-      return await this.existingDosen(id);
+      return await this.prismaService.dosen.findUnique({ where: { id } });
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -57,10 +64,17 @@ export class DosensService {
 
   async update(id: number, updateDosenDto: UpdateDosenDto): Promise<Dosen> {
     try {
-      return await this.prismaService.dosen.update({
+      const existedDosen = await this.prismaService.dosen.findUnique({
         where: { id },
-        data: updateDosenDto,
       });
+      if (!existedDosen) {
+        return null;
+      } else {
+        return await this.prismaService.dosen.update({
+          where: { id },
+          data: updateDosenDto,
+        });
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -75,7 +89,14 @@ export class DosensService {
 
   async remove(id: number): Promise<Dosen> {
     try {
-      return await this.prismaService.dosen.delete({ where: { id } });
+      const existedDosen = await this.prismaService.dosen.findUnique({
+        where: { id },
+      });
+      if (!existedDosen) {
+        return null;
+      } else {
+        return await this.prismaService.dosen.delete({ where: { id } });
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -86,10 +107,5 @@ export class DosensService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  async existingDosen(id?: number, matkul?: string): Promise<Dosen> {
-    if (id) return await this.prismaService.dosen.findUnique({ where: { id } });
-    return await this.prismaService.dosen.findUnique({ where: { matkul } });
   }
 }

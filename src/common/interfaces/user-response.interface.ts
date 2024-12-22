@@ -1,16 +1,14 @@
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 
 export interface UserResponse {
-  id: number;
-  username: string;
+  usernameByNIM: number;
   name: string;
-  role: string;
+  role: Role;
 }
 export function toUserResponse(user: User): UserResponse {
   return {
-    id: user.id,
     name: user.name,
-    username: user.username,
+    usernameByNIM: user.usernameByNIM,
     role: user.role,
   };
 }

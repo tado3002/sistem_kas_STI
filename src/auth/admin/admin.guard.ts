@@ -5,21 +5,23 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
-import { toApiResponse } from 'src/common/interfaces/response.interface';
+import { toApiResponse } from '../../common/interfaces/response.interface';
+import { UserResponse } from '../../common/interfaces/user-response.interface';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext) {
+    // mengambil request
     const request = context.switchToHttp().getRequest();
 
-    const user = request.user;
+    // mengambil object user dalam requet
+    const user: UserResponse = request.user;
 
-    if (!user || user?.role !== 'admin') {
+    // return exception jika bukan admin
+    if (!user || user.role !== Role.admin) {
       throw new HttpException(
         toApiResponse('fitur khusus admin!'),
         HttpStatus.FORBIDDEN,

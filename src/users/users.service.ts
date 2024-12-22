@@ -1,17 +1,37 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UserResponse } from 'src/common/interfaces/user-response.interface';
+import { UserResponse } from '../common/interfaces/user-response.interface';
 import { User } from '@prisma/client';
-import { toApiResponse } from 'src/common/interfaces/response.interface';
+import { toApiResponse } from '../common/interfaces/response.interface';
+import { PrismaService } from '../common/prisma.service';
+import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UsersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
+    private prismaService: PrismaService,
+  ) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      return await this.prismaService.user.create({ data: createUserDto });
+      // cari mahasiswa berdasarkan usernameByNIM
+      const mahasiswaByNIM = await this.prismaService.mahasiswa.findUnique({
+        where: { NIM: createUserDto.usernameByNIM },
+      });
+      if (mahasiswaByNIM) {
+        // buat data jika ditemukan
+        const createdUser = await this.prismaService.user.create({
+          data: { ...createUserDto, name: mahasiswaByNIM.name },
+        });
+
+        this.logger.info(`Register new user ${JSON.stringify(createUserDto)}`);
+        return createdUser;
+      } else {
+        // kembalikan null jika tidak ditemukan
+        return null;
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -33,23 +53,10 @@ export class UsersService {
     }
   }
 
-  async findOne(id: number): Promise<UserResponse> {
+  async findOne(usernameByNIM: number): Promise<UserResponse> {
     try {
-      return await this.prismaService.user.findUnique({ where: { id } });
-    } catch (error) {
-      console.log(error);
-      throw new HttpException(
-        toApiResponse('Internal server error!'),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    try {
-      return await this.prismaService.user.update({
-        where: { id },
-        data: updateUserDto,
+      return await this.prismaService.user.findUnique({
+        where: { usernameByNIM },
       });
     } catch (error) {
       console.log(error);
@@ -60,11 +67,25 @@ export class UsersService {
     }
   }
 
-  async remove(id: number): Promise<User> {
+  async update(
+    usernameByNIM: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<User> {
     try {
-      return await this.prismaService.user.delete({
-        where: { id },
+      // cari mahasiswa berdasarkan usernameByNIM
+      const mahasiswaByNIM = await this.prismaService.mahasiswa.findUnique({
+        where: { NIM: usernameByNIM },
       });
+      if (mahasiswaByNIM) {
+        // buat data jika ditemukan
+        return await this.prismaService.user.update({
+          where: { usernameByNIM },
+          data: updateUserDto,
+        });
+      } else {
+        // kembalikan null jika tidak ditemukan
+        return null;
+      }
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -73,9 +94,30 @@ export class UsersService {
       );
     }
   }
-  async findByUsername(username: string): Promise<User> {
+
+  async remove(NIM: number): Promise<User> {
     try {
-      return await this.prismaService.user.findUnique({ where: { username } });
+      const mahasiswa = await this.findOne(NIM);
+      if (mahasiswa) {
+        return await this.prismaService.user.delete({
+          where: { usernameByNIM: NIM },
+        });
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        toApiResponse('Internal server error!'),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  async findByUsername(NIM: number): Promise<User> {
+    try {
+      return await this.prismaService.user.findUnique({
+        where: { usernameByNIM: NIM },
+      });
     } catch (error) {
       console.log(error);
       throw new HttpException(

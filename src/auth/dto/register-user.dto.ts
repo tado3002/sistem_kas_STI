@@ -1,17 +1,10 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class RegisterUserDto {
   @IsNotEmpty()
-  @IsString()
-  @MinLength(5)
-  username: string;
+  @IsNumber()
+  usernameByNIM: number;
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(5)
   password: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(5)
-  name: string;
 }

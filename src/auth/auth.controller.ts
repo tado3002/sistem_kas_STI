@@ -11,13 +11,13 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import {
   ApiResponse,
   toApiResponse,
-} from 'src/common/interfaces/response.interface';
+} from '../common/interfaces/response.interface';
 import {
   LoginResponse,
   RegisterResponse,
   toLoginResponse,
   toRegisterResponse,
-} from 'src/common/interfaces/auth-response.interface';
+} from '../common/interfaces/auth-response.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -48,11 +48,7 @@ export class AuthController {
         HttpStatus.NOT_FOUND,
       );
     } else {
-      return toLoginResponse(
-        'Berhasil login!',
-        result.accessToken,
-        result.user,
-      );
+      return toLoginResponse('Berhasil login!', result.accessToken);
     }
   }
 }

@@ -15,47 +15,45 @@ import {
 import { MahasiswaService } from './mahasiswa.service';
 import { CreateMahasiswaDto } from './dto/create-mahasiswa.dto';
 import { UpdateMahasiswaDto } from './dto/update-mahasiswa.dto';
-import { AdminGuard } from 'src/auth/admin/admin.guard';
+import { AdminGuard } from '../auth/admin/admin.guard';
 import {
   ApiResponse,
   toApiResponse,
-} from 'src/common/interfaces/response.interface';
+} from '../common/interfaces/response.interface';
 import {
   MahasiswaResponse,
   toMahasiswaResponse,
-} from 'src/common/interfaces/mahasiswa-response.interface';
+} from '../common/interfaces/mahasiswa-response.interface';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('mahasiswa')
 export class MahasiswaController {
   constructor(private readonly mahasiswaService: MahasiswaService) {}
 
   @Post()
-  @UseGuards(AdminGuard)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async create(
     @Body() createMahasiswaDto: CreateMahasiswaDto,
   ): Promise<ApiResponse<MahasiswaResponse>> {
-    const mahasiswa = await this.mahasiswaService.findOne(
-      createMahasiswaDto.NIM,
-    );
-    if (mahasiswa) {
+    const mahasiswa = await this.mahasiswaService.create(createMahasiswaDto);
+    if (!mahasiswa) {
       throw new HttpException(
-        toApiResponse('Data mahasiswa tidak ditemukan!'),
+        toApiResponse('NIM sudah digunakan!'),
         HttpStatus.CONFLICT,
       );
+    } else {
+      return toApiResponse(
+        'Berhasil menambahkan data mahasiswa',
+        toMahasiswaResponse(mahasiswa),
+      );
     }
-    const result = await this.mahasiswaService.create(createMahasiswaDto);
-    return toApiResponse(
-      'Berhasil menambahkan data mahasiswa',
-      toMahasiswaResponse(result),
-    );
   }
 
   @Get()
-  @HttpCode(HttpStatus.OK)
   async findAll(): Promise<ApiResponse<MahasiswaResponse[]>> {
     const result = await this.mahasiswaService.findAll();
     const data = result?.map((mahasiswa) => toMahasiswaResponse(mahasiswa));
-    return toApiResponse('success!', data);
+    return toApiResponse('Berhasil mendapatkan data-data mahasiswa!', data);
   }
 
   @Get(':NIM')
@@ -78,8 +76,7 @@ export class MahasiswaController {
   }
 
   @Patch(':NIM')
-  @UseGuards(AdminGuard)
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async update(
     @Param(
       'NIM',
@@ -88,23 +85,25 @@ export class MahasiswaController {
     NIM: number,
     @Body() updateMahasiswaDto: UpdateMahasiswaDto,
   ): Promise<ApiResponse<MahasiswaResponse>> {
-    const mahasiswa = await this.mahasiswaService.findOne(+NIM);
+    const mahasiswa = await this.mahasiswaService.update(
+      +NIM,
+      updateMahasiswaDto,
+    );
     if (!mahasiswa) {
       throw new HttpException(
         toApiResponse('Data mahasiswa tidak ditemukan!'),
         HttpStatus.NOT_FOUND,
       );
+    } else {
+      return toApiResponse(
+        'success mengupdate data!',
+        toMahasiswaResponse(mahasiswa),
+      );
     }
-    const result = await this.mahasiswaService.update(+NIM, updateMahasiswaDto);
-    return toApiResponse(
-      'success mengupdate data!',
-      toMahasiswaResponse(result),
-    );
   }
 
   @Delete(':NIM')
-  @UseGuards(AdminGuard)
-  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async remove(
     @Param(
       'NIM',
@@ -112,17 +111,16 @@ export class MahasiswaController {
     )
     NIM: number,
   ): Promise<ApiResponse<MahasiswaResponse>> {
-    const mahasiswa = await this.mahasiswaService.findOne(+NIM);
+    const mahasiswa = await this.mahasiswaService.remove(+NIM);
     if (!mahasiswa) {
       throw new HttpException(
         toApiResponse('Data mahasiswa tidak ditemukan!'),
         HttpStatus.NOT_FOUND,
       );
     }
-    const result = await this.mahasiswaService.remove(+NIM);
     return toApiResponse(
       'success menghapus data!',
-      toMahasiswaResponse(result),
+      toMahasiswaResponse(mahasiswa),
     );
   }
 }

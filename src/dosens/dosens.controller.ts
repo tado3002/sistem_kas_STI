@@ -8,23 +8,22 @@ import {
   Delete,
   UseGuards,
   HttpStatus,
-  HttpCode,
   ParseIntPipe,
   HttpException,
 } from '@nestjs/common';
 import { DosensService } from './dosens.service';
 import { CreateDosenDto } from './dto/create-dosen.dto';
 import { UpdateDosenDto } from './dto/update-dosen.dto';
-import { AdminGuard } from 'src/auth/admin/admin.guard';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AdminGuard } from '../auth/admin/admin.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiResponse,
   toApiResponse,
-} from 'src/common/interfaces/response.interface';
+} from '../common/interfaces/response.interface';
 import {
   DosenResponse,
   toDosenResponse,
-} from 'src/common/interfaces/dosen-response.interface';
+} from '../common/interfaces/dosen-response.interface';
 
 @Controller('dosens')
 export class DosensController {
@@ -35,15 +34,13 @@ export class DosensController {
   async create(
     @Body() createDosenDto: CreateDosenDto,
   ): Promise<ApiResponse<DosenResponse>> {
-    const matkul = createDosenDto.matkul;
-    const dosen = await this.dosensService.existingDosen(null, matkul);
-    if (dosen) {
+    const result = await this.dosensService.create(createDosenDto);
+    if (!result) {
       throw new HttpException(
         toApiResponse('matkul telah ada!'),
         HttpStatus.CONFLICT,
       );
     }
-    const result = await this.dosensService.create(createDosenDto);
     return toApiResponse(
       'Berhasil menambahkan dosen!',
       toDosenResponse(result),
@@ -51,7 +48,6 @@ export class DosensController {
   }
 
   @Get()
-  @HttpCode(HttpStatus.OK)
   async findAll(): Promise<ApiResponse<DosenResponse[]>> {
     const dosens = await this.dosensService.findAll();
     const data = dosens?.map((dosen) => toDosenResponse(dosen));
@@ -59,7 +55,6 @@ export class DosensController {
   }
 
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
   async findOne(
     @Param(
       'id',
@@ -88,17 +83,16 @@ export class DosensController {
     id: number,
     @Body() updateDosenDto: UpdateDosenDto,
   ): Promise<ApiResponse<DosenResponse>> {
-    const dosen = await this.dosensService.existingDosen(+id);
-    if (!dosen) {
+    const result = await this.dosensService.update(+id, updateDosenDto);
+    if (!result) {
       throw new HttpException(
         toApiResponse('Dosen tidak ditemukan!'),
         HttpStatus.NOT_FOUND,
       );
     } else {
-      const newDosen = await this.dosensService.update(+id, updateDosenDto);
       return toApiResponse(
         'Data dosen berhasil diupdate!',
-        toDosenResponse(newDosen),
+        toDosenResponse(result),
       );
     }
   }
@@ -112,14 +106,13 @@ export class DosensController {
     )
     id: number,
   ): Promise<ApiResponse<DosenResponse>> {
-    const dosen = await this.dosensService.findOne(+id);
-    if (!dosen) {
+    const result = await this.dosensService.remove(+id);
+    if (!result) {
       throw new HttpException(
         toApiResponse('Dosen tidak ditemukan!'),
         HttpStatus.NOT_FOUND,
       );
     } else {
-      const result = await this.dosensService.remove(+id);
       return toApiResponse(
         'Berhasil menghapus data dosen!',
         toDosenResponse(result),

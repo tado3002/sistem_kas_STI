@@ -1,20 +1,17 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { UsersService } from 'src/users/users.service';
 import {
   LoginResponse,
   RegisterResponse,
-} from 'src/common/interfaces/auth-response.interface';
-import { toUserResponse } from 'src/common/interfaces/user-response.interface';
+} from '../common/interfaces/auth-response.interface';
+import { PrismaService } from '../common/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private usersService: UsersService,
     private prismaService: PrismaService,
   ) {}
   async login(loginUserDto: LoginUserDto): Promise<LoginResponse> {
@@ -22,19 +19,19 @@ export class AuthService {
       const user = await this.prismaService.user.findFirst({
         where: {
           AND: [
-            { username: loginUserDto.username },
+            { usernameByNIM: loginUserDto.usernameByNIM },
             { password: loginUserDto.password },
           ],
         },
       });
 
-      if (!user) return { accessToken: null, user: null };
+      if (!user) return null;
 
       const payload = {
-        username: user.username,
+        username: user.usernameByNIM,
       };
       const accessToken: string = this.jwtService.sign(payload);
-      return { accessToken, user: toUserResponse(user) };
+      return { accessToken };
     } catch (error) {
       console.log(error);
       throw new HttpException(
@@ -45,15 +42,19 @@ export class AuthService {
   }
   async register(registerUserDto: RegisterUserDto): Promise<RegisterResponse> {
     try {
-      const user = await this.usersService.findByUsername(
-        registerUserDto.username,
-      );
-      if (user) return null;
+      const existingUser = await this.prismaService.mahasiswa.findUnique({
+        where: { NIM: registerUserDto.usernameByNIM },
+        include: { User: true },
+      });
+      if (existingUser?.User) return null;
 
-      const result = await this.usersService.create(registerUserDto);
+      const createUser = await this.prismaService.user.create({
+        data: { ...registerUserDto, name: existingUser.name },
+      });
+
       return {
-        name: result.name,
-        username: result.username,
+        name: createUser.name,
+        usernameByNIM: createUser.usernameByNIM,
       };
     } catch (error) {
       console.log(error);

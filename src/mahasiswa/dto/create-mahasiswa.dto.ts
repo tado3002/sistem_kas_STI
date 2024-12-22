@@ -3,7 +3,6 @@ import { IsNotEmpty, IsNumber, IsString, MinLength } from 'class-validator';
 export class CreateMahasiswaDto {
   @IsNotEmpty()
   @IsNumber()
-  @MinLength(6)
   NIM: number;
 
   @IsNotEmpty()
