@@ -39,6 +39,75 @@ Response body (Error)
 }
 ```
 
+# Get Transaksi By ID
+
+Endpoint : GET /transaksi/1
+
+Response body (Success)
+
+```json
+{
+    "message" : "Berhasil mendapatkan semua data transaksi"
+    "data" : {
+
+         "id" : 1,
+         "NIM_mahasiswa" : 24121026,
+         "nominal" : 30.000,
+         "type" : "pemasukan",
+         "tanggal" : "10/12/2024",
+         "deskripsi" : "uang kas"
+    },
+}
+
+```
+
+Response body (Error)
+
+```json
+{
+  "message": "Internal server error!"
+}
+```
+
+# Get Transaksi By NIM
+
+Endpoint : GET /transaksi/NIM/24121026
+
+Response body (Success)
+
+```json
+{
+    "message" : "Berhasil mendapatkan semua data transaksi"
+    "data" : [
+        {
+            "id" : 1,
+            "NIM_mahasiswa" : 24121026,
+            "nominal" : 30.000,
+            "type" : "pemasukan",
+            "tanggal" : "10/12/2024",
+            "deskripsi" : "uang kas"
+        },
+        {
+            "id" : 2,
+            "NIM_mahasiswa" : 24121024
+            "nominal" : 10.000,
+            "type" : "pengeluaran",
+            "tanggal" : "11/12/2024",
+            "deskripsi" : "beli spidol"
+        },
+    ]
+}
+
+```
+
+Response body (Error)
+
+```json
+{
+  "message": "Internal server error!"
+}
+```
+
 # Create Transaksi
 
 Endpoint : POST /transaksi
