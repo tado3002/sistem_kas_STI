@@ -30,7 +30,7 @@ export class AuthService {
       const payload = {
         username: user.usernameByNIM,
       };
-      const accessToken: string = this.jwtService.sign(payload);
+      const accessToken: string = await this.jwtService.sign(payload);
       return { accessToken };
     } catch (error) {
       console.log(error);
@@ -46,6 +46,7 @@ export class AuthService {
         where: { NIM: registerUserDto.usernameByNIM },
         include: { User: true },
       });
+      if (!existingUser) return null;
       if (existingUser?.User) return null;
 
       const createUser = await this.prismaService.user.create({

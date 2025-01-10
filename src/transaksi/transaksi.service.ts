@@ -3,7 +3,17 @@ import { CreateTransaksiDto } from './dto/create-transaksi.dto';
 import { UpdateTransaksiDto } from './dto/update-transaksi.dto';
 import { Transaksi } from '@prisma/client';
 import { PrismaService } from '../common/prisma.service';
-import { toApiResponse } from '../common/interfaces/response.interface';
+import {
+  Pagination,
+  toApiResponse,
+  ApiResponse,
+} from '../common/interfaces/response.interface';
+import { QueriesTransaksiDto } from './dto/queries-transaksi.dto';
+import {
+  toTransaksiResponse,
+  TransaksiResponse,
+} from 'src/common/interfaces/transaksi-response.interface';
+import { toLinks } from 'src/common/utils/toLinks';
 
 @Injectable()
 export class TransaksiService {
@@ -16,7 +26,7 @@ export class TransaksiService {
       if (!existedMahasiswa) return null;
       else {
         const createTransaksi = await this.prismaService.transaksi.create({
-          data: { ...createTransaksiDto },
+          data: { ...createTransaksiDto, nama: existedMahasiswa.name },
         });
         return createTransaksi;
       }
@@ -29,10 +39,47 @@ export class TransaksiService {
     }
   }
 
-  async findAll(): Promise<Transaksi[]> {
+  async findAllPaginated(
+    queryTransaksiDto: QueriesTransaksiDto,
+  ): Promise<ApiResponse<TransaksiResponse[]>> {
     try {
-      const allTransaksi = await this.prismaService.transaksi.findMany();
-      return allTransaksi;
+      enum SortOrder {
+        ASC = 'asc',
+        DESC = 'desc',
+      }
+      let { sort, page, size } = queryTransaksiDto;
+      const totalItem = await this.prismaService.transaksi.count();
+      console.log('item berjumlah', totalItem);
+      const totalPage = Math.ceil(totalItem / size);
+      const skip = (page - 1) * size;
+
+      let transactions: Transaksi[];
+      if (totalItem === 0)
+        return toApiResponse('berhasil mendapatkan data!', transactions);
+
+      transactions = (await this.prismaService.transaksi.findMany({
+        orderBy: { tanggal: sort },
+        skip,
+        take: size,
+      })) as Transaksi[];
+
+      const transactionItemsResponse = transactions.map((item) =>
+        toTransaksiResponse(item),
+      ) as TransaksiResponse[];
+
+      const pagination: Pagination = {
+        current: page,
+        size,
+        total_item: totalItem,
+        total_page: totalPage,
+        Links: toLinks('transaksi', page, size, totalPage),
+      };
+
+      return toApiResponse(
+        'berhasil mendapatkan data!',
+        transactionItemsResponse,
+        pagination,
+      );
     } catch (error) {
       console.log(error);
       throw new HttpException(

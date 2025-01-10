@@ -10,6 +10,7 @@ import {
   HttpStatus,
   HttpException,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TransaksiService } from './transaksi.service';
 import { CreateTransaksiDto } from './dto/create-transaksi.dto';
@@ -24,6 +25,7 @@ import {
 } from '../common/interfaces/transaksi-response.interface';
 import { AdminGuard } from '../auth/admin/admin.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { QueriesTransaksiDto } from './dto/queries-transaksi.dto';
 
 @Controller('transaksi')
 export class TransaksiController {
@@ -48,15 +50,13 @@ export class TransaksiController {
   }
 
   @Get()
-  async findAll(): Promise<ApiResponse<TransaksiResponse[]>> {
-    const result = await this.transaksiService.findAll();
-    const transaksiResponse = result.map((transaksi) =>
-      toTransaksiResponse(transaksi),
-    );
-    return toApiResponse(
-      'Berhasil mendapatkan semua data transaksi!',
-      transaksiResponse,
-    );
+  async findAllPaginate(
+    @Query() queryTransaksiDto: QueriesTransaksiDto,
+  ): Promise<ApiResponse<TransaksiResponse[]>> {
+    console.log(queryTransaksiDto);
+    const result =
+      await this.transaksiService.findAllPaginated(queryTransaksiDto);
+    return result;
   }
 
   @Get('/NIM/:NIM')

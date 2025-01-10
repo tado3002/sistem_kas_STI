@@ -50,12 +50,18 @@ model Mahasiswa {
   @@id([NIM, name])
 }
 
+enum TransactionType {
+  pemasukan
+  pengeluaran
+}
+
 model Transaksi {
-  id            Int       @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
+  nama          String
   NIM_mahasiswa Int
-  mahasiswa     Mahasiswa @relation(fields: [NIM_mahasiswa], references: [NIM])
+  mahasiswa     Mahasiswa       @relation(fields: [NIM_mahasiswa, nama], references: [NIM, name])
   nominal       BigInt
-  type          String //'pemasukan' atau 'pengeluaran'
-  tanggal       DateTime  @default(now())
+  type          TransactionType //'pemasukan' atau 'pengeluaran'
+  tanggal       DateTime        @default(now())
   deskripsi     String?
 }

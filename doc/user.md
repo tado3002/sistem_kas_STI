@@ -15,15 +15,13 @@ Response Body (Success)
     "message" : "Berhasil mendapatkan data-data user"
     "data" : [
         {
-            "id" : 1,
             "name" : "m. tado",
-            "username" : "tado3923",
+            "usernameByNIM" : 24121024,
             "role" : "admin"
         },
         {
-            "id" : 2,
             "name" : "m. stalin",
-            "username" : "uraaa1945",
+            "usernameByNIM" : 24121024,
             "role" : "user"
         },
     ]
@@ -38,9 +36,38 @@ Response Body (Failed)
 }
 ```
 
+## Get Users Profile
+
+Endpoint : GET /users/profile
+
+Headers :
+
+- authorization: token
+
+Response Body (Success)
+
+```json
+{
+    "message" : "Berhasil mendapatkan data-data user"
+    "data" : {
+        "name" : "m. tado",
+        "usernameByNIM" : 24121024,
+        "role" : "admin"
+    },
+}
+```
+
+Response Body (Failed)
+
+```json
+{
+  "message": "Akses hanya untuk admin!"
+}
+```
+
 ## Update Users
 
-Endpoint : PUT /users/[:id]
+Endpoint : PUT /users/[:NIM]
 
 Headers :
 
@@ -79,7 +106,7 @@ Response Body (Failed)
 
 ## Delete Users
 
-Endpoint : DELETE /users/[:id]
+Endpoint : DELETE /users/:NIM
 
 Headers :
 
