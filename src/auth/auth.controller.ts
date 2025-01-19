@@ -27,13 +27,23 @@ export class AuthController {
   async register(
     @Body() registerUserDto: RegisterUserDto,
   ): Promise<ApiResponse<RegisterResponse>> {
-    const result = await this.authService.register(registerUserDto);
-    if (!result) {
+    const student = await this.authService.findStudent(
+      registerUserDto.usernameByNIM,
+    );
+    if (!student) {
+      throw new HttpException(
+        toApiResponse('Mahasiswa belum terdaftar!'),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    if (student.User) {
       throw new HttpException(
         toApiResponse('Username telah digunakan!'),
         HttpStatus.CONFLICT,
       );
     }
+
+    const result = await this.authService.register(registerUserDto, student);
     return toRegisterResponse('Registrasi berhasil!', result);
   }
 

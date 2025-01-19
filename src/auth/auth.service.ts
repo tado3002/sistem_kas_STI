@@ -7,6 +7,7 @@ import {
   RegisterResponse,
 } from '../common/interfaces/auth-response.interface';
 import { PrismaService } from '../common/prisma.service';
+import { Mahasiswa } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -40,23 +41,34 @@ export class AuthService {
       );
     }
   }
-  async register(registerUserDto: RegisterUserDto): Promise<RegisterResponse> {
+  async register(
+    registerUserDto: RegisterUserDto,
+    student: Mahasiswa,
+  ): Promise<RegisterResponse> {
     try {
-      const existingUser = await this.prismaService.mahasiswa.findUnique({
-        where: { NIM: registerUserDto.usernameByNIM },
-        include: { User: true },
-      });
-      if (!existingUser) return null;
-      if (existingUser?.User) return null;
-
       const createUser = await this.prismaService.user.create({
-        data: { ...registerUserDto, name: existingUser.name },
+        data: { ...registerUserDto, name: student.name },
       });
 
       return {
         name: createUser.name,
         usernameByNIM: createUser.usernameByNIM,
       };
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+  async findStudent(NIM: number) {
+    try {
+      const existingUser = await this.prismaService.mahasiswa.findUnique({
+        where: { NIM },
+        include: { User: true },
+      });
+      return existingUser;
     } catch (error) {
       console.log(error);
       throw new HttpException(
