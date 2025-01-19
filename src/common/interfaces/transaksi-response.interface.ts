@@ -1,4 +1,10 @@
 import { Transaksi } from '@prisma/client';
+import { Pagination } from './response.interface';
+
+export interface TransaksiPaginate {
+  data: Transaksi[];
+  page: Pagination;
+}
 
 export interface TransaksiResponse {
   id: number;

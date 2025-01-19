@@ -9,6 +9,7 @@ export function toLinks(
   let links: Link[] = new Array();
   for (let i = 0; i < 4; i++) {
     let link: Link;
+
     switch (i) {
       case 0:
         link = {
@@ -44,9 +45,15 @@ export function toLinks(
               : `/${prefix}?page=${totalPage}&size=${size}`,
         };
         break;
-      default:
-        break;
     }
+    links.push(link);
+  }
+  for (let j = 0; j < totalPage; j++) {
+    const link: Link = {
+      active: j + 1 !== page ? true : false,
+      label: `${j + 1}`,
+      url: `/${prefix}?page=${j + 1}&size${size}`,
+    };
     links.push(link);
   }
   return links;
