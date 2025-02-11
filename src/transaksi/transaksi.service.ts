@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTransaksiDto } from './dto/create-transaksi.dto';
 import { UpdateTransaksiDto } from './dto/update-transaksi.dto';
-import { Transaksi } from '@prisma/client';
+import { Prisma, Transaksi } from '@prisma/client';
 import { PrismaService } from '../common/prisma.service';
 import {
   Pagination,
@@ -14,6 +14,7 @@ import {
   TransaksiResponse,
 } from 'src/common/interfaces/transaksi-response.interface';
 import { toLinks } from 'src/common/utils/toLinks';
+import { contains } from 'class-validator';
 
 @Injectable()
 export class TransaksiService {
@@ -39,6 +40,18 @@ export class TransaksiService {
     }
   }
 
+  async findAll(): Promise<Transaksi[]> {
+    try {
+      return await this.prismaService.transaksi.findMany();
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        toApiResponse('internal server error'),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async findAllPaginated(
     queryTransaksiDto: QueriesTransaksiDto,
   ): Promise<ApiResponse<TransaksiResponse[]>> {
@@ -49,7 +62,6 @@ export class TransaksiService {
       }
       let { sort, page, size } = queryTransaksiDto;
       const totalItem = await this.prismaService.transaksi.count();
-      console.log('item berjumlah', totalItem);
       const totalPage = Math.ceil(totalItem / size);
       const skip = (page - 1) * size;
 
@@ -57,15 +69,20 @@ export class TransaksiService {
       if (totalItem === 0)
         return toApiResponse('berhasil mendapatkan data!', transactions);
 
-      transactions = (await this.prismaService.transaksi.findMany({
+      transactions = await this.prismaService.transaksi.findMany({
+        where: {
+          nama: {
+            contains: queryTransaksiDto.name,
+          },
+        },
         orderBy: { tanggal: sort },
         skip,
         take: size,
-      })) as Transaksi[];
+      });
 
-      const transactionItemsResponse = transactions.map((item) =>
-        toTransaksiResponse(item),
-      ) as TransaksiResponse[];
+      const transactionItemsResponse: TransaksiResponse[] = transactions.map(
+        (item) => toTransaksiResponse(item),
+      );
 
       const pagination: Pagination = {
         current: page,

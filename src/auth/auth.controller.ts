@@ -52,7 +52,7 @@ export class AuthController {
     @Body() loginUserDto: LoginUserDto,
   ): Promise<ApiResponse<LoginResponse>> {
     const result = await this.authService.login(loginUserDto);
-    if (!result.accessToken) {
+    if (!result) {
       throw new HttpException(
         toApiResponse('Username atau password salah!'),
         HttpStatus.NOT_FOUND,

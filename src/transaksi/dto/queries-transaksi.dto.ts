@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 enum SortOrder {
   ASC = 'asc',
@@ -7,6 +14,10 @@ enum SortOrder {
 }
 
 export class QueriesTransaksiDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(3)
+  name: string;
   @IsOptional()
   @Type(() => Number)
   @IsInt()

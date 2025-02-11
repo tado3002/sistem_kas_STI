@@ -19,6 +19,7 @@ model Dosen {
   name     String
   phone    String
   whatsapp String
+  Task     Task[]
 }
 
 model User {

@@ -61,6 +61,75 @@ Response body (Success)
 
 ```
 
+# Get Transaksi By Name
+
+Endpoint : GET /transaksi?name="tado" //Default: page=1, size=10, sort=desc
+
+Response body (Success)
+
+```json
+{
+    "message" : "Berhasil mendapatkan semua data transaksi"
+    "data" : [
+        {
+            "id" : 1,
+            "nama" : "Muhammad Murtadlo"
+            "NIM_mahasiswa" : 24121026,
+            "nominal" : 30.000,
+            "type" : "pemasukan",
+            "tanggal" : "2025-01-10T18:42:32.424Z",
+            "deskripsi" : "uang kas"
+        },
+        {
+            "id" : 2,
+            "nama" : "Muhammad Murtadlo"
+            "NIM_mahasiswa" : 24121025
+            "nominal" : 10.000,
+            "type" : "pengeluaran",
+            "tanggal" : "2025-01-10T18:42:32.424Z",
+            "deskripsi" : "beli spidol"
+        },
+    ],
+    "page": {
+        "current": 1,
+        "size":10,
+        "total_page": 5,
+        "total_item": 50,
+        "Links": [
+            {
+                "active": false,
+                "label": "prev",
+                "url": null
+            },
+            {
+                "active": true,
+                "label": "next",
+                "url": "/transaksi?page=2&per_page=10"
+            },
+            {
+                "active": false,
+                "label": "first",
+                "url": null
+            },
+            {
+                "active": true,
+                "label": "last",
+                "url": "/transaksi?page=5&per_page=10"
+            },
+        ]
+    }
+}
+
+```
+
+Response body (Error)
+
+```json
+{
+  "message": "Internal server error!"
+}
+```
+
 Response body (Error)
 
 ```json

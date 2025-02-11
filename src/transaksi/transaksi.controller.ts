@@ -49,11 +49,17 @@ export class TransaksiController {
     );
   }
 
+  @Get('/all')
+  async findAll(): Promise<ApiResponse<TransaksiResponse[]>> {
+    const result = await this.transaksiService.findAll();
+    const response = result.map((item) => toTransaksiResponse(item));
+    return toApiResponse('Berhasil mendapatkan transaksi', response);
+  }
+
   @Get()
   async findAllPaginate(
     @Query() queryTransaksiDto: QueriesTransaksiDto,
   ): Promise<ApiResponse<TransaksiResponse[]>> {
-    console.log(queryTransaksiDto);
     const result =
       await this.transaksiService.findAllPaginated(queryTransaksiDto);
     return result;
