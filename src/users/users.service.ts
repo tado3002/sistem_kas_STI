@@ -5,15 +5,10 @@ import { UserResponse } from '../common/interfaces/user-response.interface';
 import { User } from '@prisma/client';
 import { toApiResponse } from '../common/interfaces/response.interface';
 import { PrismaService } from '../common/prisma.service';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
-    private prismaService: PrismaService,
-  ) {}
+  constructor(private prismaService: PrismaService) {}
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       // cari mahasiswa berdasarkan usernameByNIM
@@ -26,7 +21,6 @@ export class UsersService {
           data: { ...createUserDto, name: mahasiswaByNIM.name },
         });
 
-        this.logger.info(`Register new user ${JSON.stringify(createUserDto)}`);
         return createdUser;
       } else {
         // kembalikan null jika tidak ditemukan

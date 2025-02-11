@@ -1,21 +1,11 @@
 import { Global, Module } from '@nestjs/common';
-import { WinstonModule } from 'nest-winston';
-import * as winston from 'winston';
-import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma.service';
+import { AppLogger } from './logger/logger.service';
+import { PrismaLoggerMiddleware } from './logger/prisma-logger.middleware';
 
 @Global()
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    WinstonModule.forRoot({
-      format: winston.format.json(),
-      transports: [new winston.transports.Console()],
-    }),
-  ],
-  providers: [PrismaService],
-  exports: [PrismaService],
+  providers: [PrismaService, AppLogger, PrismaLoggerMiddleware],
+  exports: [PrismaService, AppLogger],
 })
 export class CommonModule {}

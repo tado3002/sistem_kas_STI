@@ -25,10 +25,14 @@ import {
   toMahasiswaResponse,
 } from '../common/interfaces/mahasiswa-response.interface';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AppLogger } from 'src/common/logger/logger.service';
 
 @Controller('mahasiswa')
 export class MahasiswaController {
-  constructor(private readonly mahasiswaService: MahasiswaService) {}
+  constructor(
+    private readonly mahasiswaService: MahasiswaService,
+    private readonly logger: AppLogger,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -51,6 +55,7 @@ export class MahasiswaController {
 
   @Get()
   async findAll(): Promise<ApiResponse<MahasiswaResponse[]>> {
+    this.logger.log('Fetching all mahasiswa', 'MahasiswaController');
     const result = await this.mahasiswaService.findAll();
     const data = result?.map((mahasiswa) => toMahasiswaResponse(mahasiswa));
     return toApiResponse('Berhasil mendapatkan data-data mahasiswa!', data);
