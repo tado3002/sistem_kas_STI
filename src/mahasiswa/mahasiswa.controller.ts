@@ -11,6 +11,7 @@ import {
   HttpStatus,
   ParseIntPipe,
   HttpException,
+  Query,
 } from '@nestjs/common';
 import { MahasiswaService } from './mahasiswa.service';
 import { CreateMahasiswaDto } from './dto/create-mahasiswa.dto';
@@ -26,6 +27,8 @@ import {
 } from '../common/interfaces/mahasiswa-response.interface';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AppLogger } from 'src/common/logger/logger.service';
+import { QueriesMahasiswaDto } from './dto/queries-mahasiswa.dto';
+import { Mahasiswa } from '@prisma/client';
 
 @Controller('mahasiswa')
 export class MahasiswaController {
@@ -40,6 +43,7 @@ export class MahasiswaController {
     @Body() createMahasiswaDto: CreateMahasiswaDto,
   ): Promise<ApiResponse<MahasiswaResponse>> {
     const mahasiswa = await this.mahasiswaService.create(createMahasiswaDto);
+    this.logger.log('Fetching create mahasiswa', 'MahasiswaController');
     if (!mahasiswa) {
       throw new HttpException(
         toApiResponse('NIM sudah digunakan!'),
@@ -54,9 +58,15 @@ export class MahasiswaController {
   }
 
   @Get()
-  async findAll(): Promise<ApiResponse<MahasiswaResponse[]>> {
+  async findAll(
+    @Query() queriesMahasiswaDto: QueriesMahasiswaDto,
+  ): Promise<ApiResponse<MahasiswaResponse[]>> {
     this.logger.log('Fetching all mahasiswa', 'MahasiswaController');
-    const result = await this.mahasiswaService.findAll();
+    let result: Mahasiswa[];
+
+    if (queriesMahasiswaDto.name) {
+      result = await this.mahasiswaService.findByQueries(queriesMahasiswaDto);
+    } else result = await this.mahasiswaService.findAll();
     const data = result?.map((mahasiswa) => toMahasiswaResponse(mahasiswa));
     return toApiResponse('Berhasil mendapatkan data-data mahasiswa!', data);
   }
@@ -70,6 +80,10 @@ export class MahasiswaController {
     )
     NIM: number,
   ): Promise<ApiResponse<MahasiswaResponse>> {
+    this.logger.log(
+      `Fetching get mahasiswa by NIM ${NIM}`,
+      'MahasiswaController',
+    );
     const mahasiswa = await this.mahasiswaService.findOne(+NIM);
     if (!mahasiswa) {
       throw new HttpException(
@@ -90,6 +104,10 @@ export class MahasiswaController {
     NIM: number,
     @Body() updateMahasiswaDto: UpdateMahasiswaDto,
   ): Promise<ApiResponse<MahasiswaResponse>> {
+    this.logger.log(
+      `Fetching update mahasiswa with NIM ${NIM}`,
+      'MahasiswaController',
+    );
     const mahasiswa = await this.mahasiswaService.update(
       +NIM,
       updateMahasiswaDto,
@@ -116,6 +134,10 @@ export class MahasiswaController {
     )
     NIM: number,
   ): Promise<ApiResponse<MahasiswaResponse>> {
+    this.logger.log(
+      `Fetching delete mahasiswa with NIM ${NIM}`,
+      'MahasiswaController',
+    );
     const mahasiswa = await this.mahasiswaService.remove(+NIM);
     if (!mahasiswa) {
       throw new HttpException(

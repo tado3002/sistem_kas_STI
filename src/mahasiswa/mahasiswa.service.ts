@@ -3,6 +3,8 @@ import { CreateMahasiswaDto } from './dto/create-mahasiswa.dto';
 import { UpdateMahasiswaDto } from './dto/update-mahasiswa.dto';
 import { Mahasiswa } from '@prisma/client';
 import { PrismaService } from '../common/prisma.service';
+import { QueriesMahasiswaDto } from './dto/queries-mahasiswa.dto';
+import { queryObjects } from 'v8';
 
 @Injectable()
 export class MahasiswaService {
@@ -30,6 +32,23 @@ export class MahasiswaService {
     try {
       // mengambil semua data mahasiswa
       return await this.prismaService.mahasiswa.findMany();
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async findByQueries(
+    queriesMahasiswaDto: QueriesMahasiswaDto,
+  ): Promise<Mahasiswa[]> {
+    try {
+      return await this.prismaService.mahasiswa.findMany({
+        where: {
+          name: {
+            contains: queriesMahasiswaDto.name,
+          },
+        },
+      });
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
