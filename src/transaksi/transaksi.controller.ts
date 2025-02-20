@@ -26,10 +26,14 @@ import {
 import { AdminGuard } from '../auth/admin/admin.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { QueriesTransaksiDto } from './dto/queries-transaksi.dto';
+import { AppLogger } from 'src/common/logger/logger.service';
 
 @Controller('transaksi')
 export class TransaksiController {
-  constructor(private readonly transaksiService: TransaksiService) {}
+  constructor(
+    private readonly transaksiService: TransaksiService,
+    private readonly logger: AppLogger,
+  ) {}
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
@@ -37,6 +41,7 @@ export class TransaksiController {
     @Body() createTransaksiDto: CreateTransaksiDto,
   ): Promise<ApiResponse<TransaksiResponse>> {
     const result = await this.transaksiService.create(createTransaksiDto);
+    this.logger.log('Fetching create transaction', 'TransactionController');
     if (!result) {
       throw new HttpException(
         toApiResponse('NIM tidak ditemukan!'),
@@ -51,6 +56,7 @@ export class TransaksiController {
 
   @Get('/all')
   async findAll(): Promise<ApiResponse<TransaksiResponse[]>> {
+    this.logger.log('Fetching all transaction', 'TransactionController');
     const result = await this.transaksiService.findAll();
     const response = result.map((item) => toTransaksiResponse(item));
     return toApiResponse('Berhasil mendapatkan transaksi', response);
@@ -60,6 +66,7 @@ export class TransaksiController {
   async findAllPaginate(
     @Query() queryTransaksiDto: QueriesTransaksiDto,
   ): Promise<ApiResponse<TransaksiResponse[]>> {
+    this.logger.log('Fetching paginate transaction', 'TransactionController');
     const result =
       await this.transaksiService.findAllPaginated(queryTransaksiDto);
     return result;
@@ -73,6 +80,7 @@ export class TransaksiController {
     )
     NIM: number,
   ): Promise<ApiResponse<TransaksiResponse[]>> {
+    this.logger.log('Fetching find(NIM) transactions', 'TransactionController');
     const result = await this.transaksiService.findByNIM(+NIM);
     if (!result) {
       throw new HttpException(
@@ -95,6 +103,7 @@ export class TransaksiController {
     )
     id: number,
   ): Promise<ApiResponse<TransaksiResponse>> {
+    this.logger.log('Fetching get one transaction', 'TransactionController');
     const result = await this.transaksiService.findOne(+id);
     if (!result) {
       throw new HttpException(
@@ -118,6 +127,7 @@ export class TransaksiController {
     id: number,
     @Body() updateTransaksiDto: UpdateTransaksiDto,
   ): Promise<ApiResponse<TransaksiResponse>> {
+    this.logger.log('Fetching update transaction', 'TransactionController');
     const result = await this.transaksiService.update(+id, updateTransaksiDto);
     if (!result) {
       throw new HttpException(
@@ -141,6 +151,7 @@ export class TransaksiController {
     )
     id: number,
   ): Promise<ApiResponse<TransaksiResponse>> {
+    this.logger.log('Fetching delete transaction', 'TransactionController');
     const result = await this.transaksiService.remove(+id);
     if (!result) {
       throw new HttpException(

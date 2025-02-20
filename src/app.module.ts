@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { MahasiswaModule } from './mahasiswa/mahasiswa.module';
 import { CommonModule } from './common/common.module';
 import { TransaksiModule } from './transaksi/transaksi.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   controllers: [AppController],
@@ -18,6 +19,7 @@ import { TransaksiModule } from './transaksi/transaksi.module';
     MahasiswaModule,
     CommonModule,
     TransaksiModule,
+    TasksModule,
   ],
 })
 export class AppModule {}
