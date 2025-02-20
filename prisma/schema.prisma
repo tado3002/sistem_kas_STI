@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -20,6 +21,15 @@ model Dosen {
   phone    String
   whatsapp String
   Task     Task[]
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  description String
+  deadline    DateTime
+  dosen       Dosen    @relation(fields: [dosenId], references: [id])
+  dosenId     Int
+  createdAt   DateTime @default(now())
 }
 
 model User {
