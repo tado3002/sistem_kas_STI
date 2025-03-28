@@ -55,7 +55,7 @@ export class TasksController {
   ): Promise<ApiResponse<TaskPaginate>> {
     try {
       const result = await this.tasksService.findAllPaginate(queriesTaskDto);
-      return toApiResponse('Berhasil menambahkan task!', result);
+      return toApiResponse('Berhasil mendapatkan task!', result);
     } catch (error) {
       if (!(error instanceof InternalServerErrorException)) {
         throw error;
@@ -93,7 +93,7 @@ export class TasksController {
   async findOne(@Param('id') id: string): Promise<ApiResponse<TaskResponse>> {
     try {
       const result = await this.tasksService.findOne(+id);
-      return toApiResponse('Berhasil mendapatkan data!', result);
+      return toApiResponse('Berhasil mendapatkan task!', result);
     } catch (error) {
       if (!(error instanceof InternalServerErrorException)) {
         throw error;
