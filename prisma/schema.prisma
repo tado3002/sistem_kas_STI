@@ -25,6 +25,7 @@ model Dosen {
 
 model Task {
   id          Int      @id @default(autoincrement())
+  title       String
   description String
   deadline    DateTime
   dosen       Dosen    @relation(fields: [dosenId], references: [id])
