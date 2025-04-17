@@ -11,26 +11,17 @@ response body (Success)
   "data": [
     {
       "id": 1,
-      "matkul": "Algoritma dan Pemrograman",
-      "matkul_id": 3,
-      "dosen": "Pak Rasyid",
+      "dosen": {
+        "id": 2,
+        "matkul": "Algoritma Pemrograman",
+        "name": "Pak Rasyid",
+        "phone": "086482238",
+        "whatsapp": "linkwatsapp"
+      },
       "title": "Membuat flowchart sorting",
-      "description": [
-        "dibuat menggunakan flowchart.io",
-        "dicoding di kertas dan dicompile di otak"
-      ],
-      "deadline": ""
-    },
-    {
-      "id": 2,
-      "matkul": "Pendidikan Pancasila",
-      "matkul_id": 2,
-      "dosen": "Pak Fajar",
-      "title": "Membuat video mengkritik pemerintah",
-      "description": [
-        "diupload di Instagram, dengan hashtag mosi tidak percaya fufufafa"
-      ],
-      "deadline": ""
+      "description": "dicoding di kertas dan dicompile di otak",
+      "deadline": "2025-04-17T02:27:54:281Z",
+      "createdAt": "2025-04-17T02:27:54:281Z"
     }
   ],
   "page": {
@@ -39,5 +30,165 @@ response body (Success)
     "totalPages": 10,
     "number": 1
   }
+}
+```
+
+# GET Tasks By id
+
+endpoint : GET /tasks/:id
+response body (Success)
+
+```json
+{
+  "message": "Berhasil mendapatkan data tugas!",
+  "data": [
+    {
+      "id": 1,
+      "dosen": {
+        "id": 2,
+        "matkul": "Algoritma Pemrograman",
+        "name": "Pak Rasyid",
+        "phone": "086482238",
+        "whatsapp": "linkwatsapp"
+      },
+      "title": "Membuat flowchart sorting",
+      "description": "dicoding di kertas dan dicompile di otak",
+      "deadline": "2025-04-17T02:27:54:281Z",
+      "createdAt": "2025-04-17T02:27:54:281Z"
+    }
+  ]
+}
+```
+
+# GET Tasks is pending
+
+endpoint : GET /tasks/pending
+response body (Success)
+
+```json
+{
+  "message": "Berhasil mendapatkan data tugas yang belum deadline!",
+  "data": [
+    {
+      "id": 1,
+      "dosen": {
+        "id": 2,
+        "matkul": "Algoritma Pemrograman",
+        "name": "Pak Rasyid",
+        "phone": "086482238",
+        "whatsapp": "linkwatsapp"
+      },
+      "title": "Membuat flowchart sorting",
+      "description": "dicoding di kertas dan dicompile di otak",
+      "deadline": "2025-04-17T02:27:54:281Z",
+      "createdAt": "2025-04-17T02:27:54:281Z"
+    }
+  ]
+}
+```
+
+# POST Tasks
+
+Endpoint : POST /tasks
+
+Headers :
+
+- authorization: token
+
+Request Body
+
+```
+{
+    "dosenId" : 2,
+    "title" : "Membuat flowchart sorting"
+    "description":"dicoding di kertas dan dicompile di otak",
+    "deadline": "2025-04-17"
+}
+
+```
+
+Response body (Success)
+
+```json
+{
+  "message": "Berhasil menambahkan data tugas!"
+}
+```
+
+Response body (Error)
+
+```json
+{
+  "message": "Internal Server Error"
+}
+```
+
+# PATCH Tasks
+
+Endpoint : PATCH /tasks/:id
+
+- authorization: token
+
+Request Body
+
+```
+{
+    "dosenId" : 2,
+    "title" : "Membuat flowchart segitiga"
+    "description":"dicoding di kertas dan dicompile di otak",
+    "deadline": "2025-04-17"
+}
+
+```
+
+Response body (Success)
+
+```json
+{
+  "message": "Berhasil mengupdate data tugas!",
+  "data": {
+    "id": 1,
+    "dosen": {
+      "id": 2,
+      "matkul": "Algoritma Pemrograman",
+      "name": "Pak Rasyid",
+      "phone": "086482238",
+      "whatsapp": "linkwatsapp"
+    },
+    "title": "Membuat flowchart segitiga",
+    "description": "dicoding di kertas dan dicompile di otak",
+    "deadline": "2025-04-17T02:27:54:281Z",
+    "createdAt": "2025-04-17T02:27:54:281Z"
+  }
+}
+```
+
+Response body (Error)
+
+```json
+{
+  "message": "Internal Server Error"
+}
+```
+
+# DELETE Tasks
+
+Endpoint : DELETE /tasks/:id
+
+- authorization: token
+
+Response body (Success)
+
+```json
+{
+  "message": "Berhasil menghapus data tugas!"
+}
+```
+
+Response body (Error)
+
+```json
+{
+  "message": "Internal Server Error"
 }
 ```
