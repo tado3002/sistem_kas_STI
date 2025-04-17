@@ -41,22 +41,20 @@ response body (Success)
 ```json
 {
   "message": "Berhasil mendapatkan data tugas!",
-  "data": [
-    {
-      "id": 1,
-      "dosen": {
-        "id": 2,
-        "matkul": "Algoritma Pemrograman",
-        "name": "Pak Rasyid",
-        "phone": "086482238",
-        "whatsapp": "linkwatsapp"
-      },
-      "title": "Membuat flowchart sorting",
-      "description": "dicoding di kertas dan dicompile di otak",
-      "deadline": "2025-04-17T02:27:54:281Z",
-      "createdAt": "2025-04-17T02:27:54:281Z"
-    }
-  ]
+  "data": {
+    "id": 1,
+    "dosen": {
+      "id": 2,
+      "matkul": "Algoritma Pemrograman",
+      "name": "Pak Rasyid",
+      "phone": "086482238",
+      "whatsapp": "linkwatsapp"
+    },
+    "title": "Membuat flowchart sorting",
+    "description": "dicoding di kertas dan dicompile di otak",
+    "deadline": "2025-04-17T02:27:54:281Z",
+    "createdAt": "2025-04-17T02:27:54:281Z"
+  }
 }
 ```
 
