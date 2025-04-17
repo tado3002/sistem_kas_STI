@@ -5,6 +5,8 @@ export class CreateTaskDto {
   @IsPositive()
   dosenId: number;
   @IsString()
+  title: string;
+  @IsString()
   description: string;
   @Type(() => Date)
   @IsDate()

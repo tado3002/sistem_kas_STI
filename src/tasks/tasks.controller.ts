@@ -8,6 +8,7 @@ import {
   Delete,
   InternalServerErrorException,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -22,6 +23,8 @@ import {
   TaskResponse,
 } from 'src/common/interfaces/task-response.interface';
 import { QueriesTaskDto } from './dto/queries-task.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { AdminGuard } from 'src/auth/admin/admin.guard';
 
 @Controller('tasks')
 export class TasksController {
@@ -31,6 +34,7 @@ export class TasksController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, AdminGuard)
   async create(
     @Body() createTaskDto: CreateTaskDto,
   ): Promise<ApiResponse<string>> {
@@ -89,11 +93,14 @@ export class TasksController {
     }
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ApiResponse<TaskResponse>> {
+  @Get('/pending')
+  async findAllPending(): Promise<ApiResponse<TaskResponse[]>> {
     try {
-      const result = await this.tasksService.findOne(+id);
-      return toApiResponse('Berhasil mendapatkan task!', result);
+      const result = await this.tasksService.findAllIsPending();
+      return toApiResponse(
+        'Berhasil mendapatkan task yang belum deadline!',
+        result,
+      );
     } catch (error) {
       if (!(error instanceof InternalServerErrorException)) {
         throw error;
@@ -108,10 +115,14 @@ export class TasksController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async update(
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ): Promise<ApiResponse<TaskResponse>> {
     try {
-      await this.tasksService.update(+id, updateTaskDto);
-      return toApiResponse(`Berhasil update task id ${id}`);
+      const data = await this.tasksService.update(+id, updateTaskDto);
+      return toApiResponse(`Berhasil update task id ${id}`, data);
     } catch (error) {
       if (!(error instanceof InternalServerErrorException)) {
         throw error;
@@ -126,7 +137,8 @@ export class TasksController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async remove(@Param('id') id: string): Promise<ApiResponse<string>> {
     try {
       await this.tasksService.remove(+id);
       return toApiResponse(`Berhasil menghapus task id ${id}`);

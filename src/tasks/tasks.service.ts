@@ -13,6 +13,7 @@ import {
 } from 'src/common/interfaces/task-response.interface';
 import { QueriesTaskDto } from './dto/queries-task.dto';
 import { toLinks } from 'src/common/utils/toLinks';
+import { Task } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
@@ -62,6 +63,18 @@ export class TasksService {
     };
   }
 
+  async findAllIsPending(): Promise<TaskResponse[]> {
+    const tasks = await this.prismaService.task.findMany({
+      where: {
+        deadline: {
+          gt: new Date(),
+        },
+      },
+      include: { dosen: true },
+    });
+    return tasks.map((task) => toTaskResponse(task));
+  }
+
   async isDosenIdExist(id: number): Promise<boolean> {
     return (
       (await this.prismaService.dosen.findFirst({
@@ -106,7 +119,10 @@ export class TasksService {
     return toTaskResponse(task);
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<void> {
+  async update(
+    id: number,
+    updateTaskDto: UpdateTaskDto,
+  ): Promise<TaskResponse> {
     if (!(await this.isTaskIdExist(id))) {
       throw new HttpException(
         toApiResponse(`Task dengan id ${id} tidak ditemukan!`),
@@ -127,6 +143,7 @@ export class TasksService {
       where: { id },
       data: updateTaskDto,
     });
+    return await this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {

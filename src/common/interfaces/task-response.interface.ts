@@ -8,9 +8,9 @@ export interface TaskPaginate {
 
 export interface TaskResponse {
   id: number;
-  matkul: string;
-  namaDosen: string;
-  deskripsi: string;
+  dosen: Dosen;
+  title: string;
+  description: string;
   deadline: Date;
   createdAt: Date;
 }
@@ -18,9 +18,9 @@ export interface TaskResponse {
 export function toTaskResponse(task: Task & { dosen: Dosen }): TaskResponse {
   return {
     id: task.id,
-    matkul: task.dosen.matkul,
-    namaDosen: task.dosen.name,
-    deskripsi: task.description,
+    dosen: task.dosen,
+    title: task.title,
+    description: task.description,
     deadline: task.deadline,
     createdAt: task.createdAt,
   };
