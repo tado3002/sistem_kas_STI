@@ -13,25 +13,18 @@ import {
 } from 'src/common/interfaces/task-response.interface';
 import { QueriesTaskDto } from './dto/queries-task.dto';
 import { toLinks } from 'src/common/utils/toLinks';
-import { Task } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createTaskDto: CreateTaskDto): Promise<void> {
-    if (!(await this.isDosenIdExist(createTaskDto.dosenId))) {
-      throw new HttpException(
-        toApiResponse(
-          `Dosen dengan id ${createTaskDto.dosenId} tidak ditemukan!`,
-        ),
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    await this.throwIfDosenNotExist(createTaskDto.dosenId);
     await this.prismaService.task.create({
       data: createTaskDto,
     });
   }
+
   async findAllPaginate(queriesTaskDto: QueriesTaskDto): Promise<TaskPaginate> {
     const total_item = await this.prismaService.task.count();
     const total_page = Math.ceil(total_item / queriesTaskDto.size);
@@ -75,14 +68,6 @@ export class TasksService {
     return tasks.map((task) => toTaskResponse(task));
   }
 
-  async isDosenIdExist(id: number): Promise<boolean> {
-    return (
-      (await this.prismaService.dosen.findFirst({
-        where: { id },
-      })) && true
-    );
-  }
-
   async isTaskIdExist(id: number): Promise<boolean> {
     return (
       (await this.prismaService.task.findFirst({
@@ -110,12 +95,7 @@ export class TasksService {
         dosen: true,
       },
     });
-    if (!task) {
-      throw new HttpException(
-        toApiResponse(`Task dengan id ${id} tidak ditemukan!`),
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    if (!task) this.throwNotFound(`Task dengan id ${id} tidak ditemukan`);
     return toTaskResponse(task);
   }
 
@@ -123,21 +103,8 @@ export class TasksService {
     id: number,
     updateTaskDto: UpdateTaskDto,
   ): Promise<TaskResponse> {
-    if (!(await this.isTaskIdExist(id))) {
-      throw new HttpException(
-        toApiResponse(`Task dengan id ${id} tidak ditemukan!`),
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    const dosen = await this.isDosenIdExist(updateTaskDto.dosenId);
-    if (!dosen) {
-      throw new HttpException(
-        toApiResponse(
-          `Dosen dengan id ${updateTaskDto.dosenId} tidak ditemukan!`,
-        ),
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    await this.throwIfTaskNotExist(id);
+    await this.throwIfDosenNotExist(updateTaskDto.dosenId);
 
     await this.prismaService.task.update({
       where: { id },
@@ -146,16 +113,36 @@ export class TasksService {
     return await this.findOne(id);
   }
 
-  async remove(id: number): Promise<void> {
-    if (!(await this.isTaskIdExist(id))) {
-      throw new HttpException(
-        toApiResponse(`Task dengan id ${id} tidak ditemukan!`),
-        HttpStatus.NOT_FOUND,
-      );
-    }
+  async remove(id: number): Promise<TaskResponse> {
+    await this.throwIfTaskNotExist(id);
 
-    await this.prismaService.task.delete({
+    return await this.prismaService.task.delete({
       where: { id },
+      include: {
+        dosen: true,
+      },
     });
+  }
+
+  private async throwIfDosenNotExist(dosenId: number): Promise<void> {
+    const found = await this.prismaService.dosen.findFirst({
+      where: { id: dosenId },
+    });
+    if (!found) {
+      this.throwNotFound(`Dosen dengan id ${dosenId} tidak ditemukan!`);
+    }
+  }
+
+  private async throwIfTaskNotExist(taskId: number): Promise<void> {
+    const found = await this.prismaService.task.findFirst({
+      where: { id: taskId },
+    });
+    if (!found) {
+      this.throwNotFound(`Task dengan id ${taskId} tidak ditemukan!`);
+    }
+  }
+
+  private throwNotFound(message: string): never {
+    throw new HttpException(toApiResponse(message), HttpStatus.NOT_FOUND);
   }
 }

@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  InternalServerErrorException,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -25,93 +24,70 @@ import {
 import { QueriesTaskDto } from './dto/queries-task.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AdminGuard } from 'src/auth/admin/admin.guard';
+import { BaseController } from 'src/common/controllers/base.controller';
 
 @Controller('tasks')
-export class TasksController {
+export class TasksController extends BaseController {
   constructor(
     private readonly tasksService: TasksService,
-    private readonly logger: AppLogger,
-  ) {}
+    protected readonly logger: AppLogger,
+  ) {
+    super(logger);
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard, AdminGuard)
   async create(
     @Body() createTaskDto: CreateTaskDto,
   ): Promise<ApiResponse<string>> {
-    try {
-      await this.tasksService.create(createTaskDto);
-      return toApiResponse('Berhasil menambahkan task!');
-    } catch (error) {
-      if (!(error instanceof InternalServerErrorException)) {
-        throw error;
-      }
-      this.logger.error(
-        'Failed to fetch create',
-        error.stack,
-        'TasksController',
-      );
-      throw new InternalServerErrorException('internal server error!');
-    }
+    return this.handle(
+      () =>
+        this.tasksService
+          .create(createTaskDto)
+          .then(() => toApiResponse('Berhasil menambahkan task!')),
+      'create',
+    );
   }
+
   @Get()
   async findAllPaginate(
     @Query() queriesTaskDto: QueriesTaskDto,
   ): Promise<ApiResponse<TaskPaginate>> {
-    try {
-      const result = await this.tasksService.findAllPaginate(queriesTaskDto);
-      return toApiResponse('Berhasil mendapatkan task!', result);
-    } catch (error) {
-      if (!(error instanceof InternalServerErrorException)) {
-        throw error;
-      }
-      this.logger.error(
-        'Failed to fetch create',
-        error.stack,
-        'TasksController',
-      );
-      throw new InternalServerErrorException('internal server error!');
-    }
+    return this.handle(
+      () =>
+        this.tasksService
+          .findAllPaginate(queriesTaskDto)
+          .then((result) =>
+            toApiResponse('Berhasil mendapatkan semua task!', result),
+          ),
+      'findAllPaginate',
+    );
   }
 
   @Get('/all')
   async findAll(): Promise<ApiResponse<TaskResponse[]>> {
-    try {
-      return toApiResponse(
-        'Berhasil mendapatkan data!',
-        await this.tasksService.findAll(),
-      );
-    } catch (error) {
-      if (!(error instanceof InternalServerErrorException)) {
-        throw error;
-      }
-      this.logger.error(
-        'Failed to fetch create',
-        error.stack,
-        'TasksController',
-      );
-      throw new InternalServerErrorException('internal server error!');
-    }
+    return this.handle(
+      () =>
+        this.tasksService
+          .findAll()
+          .then((result) =>
+            toApiResponse('Berhasil mendapatkan semua task!', result),
+          ),
+      'findAll',
+    );
   }
 
   @Get('/pending')
   async findAllPending(): Promise<ApiResponse<TaskResponse[]>> {
-    try {
-      const result = await this.tasksService.findAllIsPending();
-      return toApiResponse(
-        'Berhasil mendapatkan task yang belum deadline!',
-        result,
-      );
-    } catch (error) {
-      if (!(error instanceof InternalServerErrorException)) {
-        throw error;
-      }
-      this.logger.error(
-        'Failed to fetch create',
-        error.stack,
-        'TasksController',
-      );
-      throw new InternalServerErrorException('internal server error!');
-    }
+    return this.handle(
+      () =>
+        this.tasksService
+          .findAllIsPending()
+          .then((result) =>
+            toApiResponse('Berhasil mendapatkan semua task!', result),
+          ),
+      'findAllIsPending',
+    );
   }
 
   @Patch(':id')
@@ -120,38 +96,26 @@ export class TasksController {
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<ApiResponse<TaskResponse>> {
-    try {
-      const data = await this.tasksService.update(+id, updateTaskDto);
-      return toApiResponse(`Berhasil update task id ${id}`, data);
-    } catch (error) {
-      if (!(error instanceof InternalServerErrorException)) {
-        throw error;
-      }
-      this.logger.error(
-        'Failed to fetch create',
-        error.stack,
-        'TasksController',
-      );
-      throw new InternalServerErrorException('internal server error!');
-    }
+    return this.handle(
+      () =>
+        this.tasksService
+          .update(+id, updateTaskDto)
+          .then((result) =>
+            toApiResponse('Berhasil memperbarui task!', result),
+          ),
+      'update',
+    );
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async remove(@Param('id') id: string): Promise<ApiResponse<string>> {
-    try {
-      await this.tasksService.remove(+id);
-      return toApiResponse(`Berhasil menghapus task id ${id}`);
-    } catch (error) {
-      if (!(error instanceof InternalServerErrorException)) {
-        throw error;
-      }
-      this.logger.error(
-        'Failed to fetch create',
-        error.stack,
-        'TasksController',
-      );
-      throw new InternalServerErrorException('internal server error!');
-    }
+  async remove(@Param('id') id: string): Promise<ApiResponse<TaskResponse>> {
+    return this.handle(
+      () =>
+        this.tasksService
+          .remove(+id)
+          .then((result) => toApiResponse('Berhasil menghapus task!', result)),
+      'remove',
+    );
   }
 }
