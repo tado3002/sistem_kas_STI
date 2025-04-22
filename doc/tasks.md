@@ -2,7 +2,7 @@
 
 # GET Tasks
 
-endpoint : GET /tasks
+endpoint : GET /tasks //Default: page=1, size=10, sort=desc
 response body (Success)
 
 ```json
@@ -85,7 +85,7 @@ response body (Success)
 }
 ```
 
-# POST Tasks
+# Create Tasks
 
 Endpoint : POST /tasks
 
@@ -121,7 +121,7 @@ Response body (Error)
 }
 ```
 
-# PATCH Tasks
+# Update Tasks
 
 Endpoint : PATCH /tasks/:id
 

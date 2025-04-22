@@ -67,7 +67,7 @@ Response Body (Failed)
 
 ## Update Users
 
-Endpoint : PUT /users/[:NIM]
+Endpoint : PUT /users/:NIM
 
 Headers :
 
@@ -116,14 +116,12 @@ Response Body (Success)
 
 ```json
 {
-    "message" : "Berhasil menghapus data user!"
-    "data" :
-        {
-            "name" : "m. tado",
-            "usernameByNIM" : "tado3923",
-            "role" : "admin"
-        },
-
+  "message": "Berhasil menghapus data user!",
+  "data": {
+    "name": "m. tado",
+    "usernameByNIM": "tado3923",
+    "role": "admin"
+  }
 }
 ```
 

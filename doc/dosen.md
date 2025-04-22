@@ -36,9 +36,52 @@ Response Body (Failed)
 }
 ```
 
+## Post Dosen
+
+Endpoint : POST /dosens
+
+Headers :
+
+- authorization: token
+
+Request Body
+
+```
+{
+    "matkul" : "Algoritma Pemrograman",
+    "name" : "Pak Rasyid",
+    "phone":"086482238",
+    "whatsapp":"linkwatsapp"
+}
+
+```
+
+Response Body (Success)
+
+```json
+{
+    "message" : "Berhasil menambahkan data dosen"
+    "data" : {
+        "id" : 2,
+        "matkul" : "Algoritma Pemrograman",
+        "name" : "Pak Rasyid",
+        "phone":"086482238",
+        "whatsapp":"linkwatsapp"
+    }
+}
+```
+
+Response Body (Failed)
+
+```json
+{
+  "message": "Akses hanya untuk admin!"
+}
+```
+
 ## Update Dosen
 
-Endpoint : PUT /dosens/[:id]
+Endpoint : PUT /dosens/:id
 
 Headers :
 
@@ -81,7 +124,7 @@ Response Body (Failed)
 
 ## Delete Users
 
-Endpoint : DELETE /dosens/[:id]
+Endpoint : DELETE /dosens/:id
 
 Headers :
 

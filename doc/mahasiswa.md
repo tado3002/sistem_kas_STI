@@ -54,7 +54,7 @@ Response Body (failed)
 
 # Post Mahasiswa
 
-Endpoint : POST /mahasiswa/:NIM
+Endpoint : POST /mahasiswa
 
 Headers :
 

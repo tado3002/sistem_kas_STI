@@ -171,7 +171,7 @@ Response body (Error)
 
 # Get Transaksi By NIM
 
-Endpoint : GET /transaksi/NIM/24121026
+Endpoint : GET /transaksi/NIM/:NIM
 
 Response body (Success)
 
