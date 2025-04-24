@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -45,7 +46,7 @@ export class TasksController extends BaseController {
         this.tasksService
           .create(createTaskDto)
           .then(() => toApiResponse('Berhasil menambahkan task!')),
-      'create',
+      'Create',
     );
   }
 
@@ -60,7 +61,7 @@ export class TasksController extends BaseController {
           .then((result) =>
             toApiResponse('Berhasil mendapatkan semua task!', result),
           ),
-      'findAllPaginate',
+      'Get All Paginate',
     );
   }
 
@@ -73,7 +74,7 @@ export class TasksController extends BaseController {
           .then((result) =>
             toApiResponse('Berhasil mendapatkan semua task!', result),
           ),
-      'findAll',
+      'Get All',
     );
   }
 
@@ -86,14 +87,29 @@ export class TasksController extends BaseController {
           .then((result) =>
             toApiResponse('Berhasil mendapatkan semua task!', result),
           ),
-      'findAllIsPending',
+      'Get All is Pending',
+    );
+  }
+
+  @Get(':id')
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ApiResponse<TaskResponse>> {
+    return this.handle(
+      () =>
+        this.tasksService
+          .findOne(+id)
+          .then((result) =>
+            toApiResponse('Berhasil mendapatkan task!', result),
+          ),
+      'Get By Id',
     );
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, AdminGuard)
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,
   ): Promise<ApiResponse<TaskResponse>> {
     return this.handle(
@@ -103,19 +119,21 @@ export class TasksController extends BaseController {
           .then((result) =>
             toApiResponse('Berhasil memperbarui task!', result),
           ),
-      'update',
+      'Update',
     );
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, AdminGuard)
-  async remove(@Param('id') id: string): Promise<ApiResponse<TaskResponse>> {
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ApiResponse<TaskResponse>> {
     return this.handle(
       () =>
         this.tasksService
           .remove(+id)
           .then((result) => toApiResponse('Berhasil menghapus task!', result)),
-      'remove',
+      'Delete',
     );
   }
 }
