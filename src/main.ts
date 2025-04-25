@@ -14,7 +14,10 @@ async function bootstrap() {
         for (const err of errors) {
           formattedErrors[err.property] = Object.values(err.constraints);
         }
-        return new BadRequestException({ message: formattedErrors });
+        return new BadRequestException({
+          message: 'Data yang diberikan tidak valid!',
+          errors: formattedErrors,
+        });
       },
     }),
   );
