@@ -93,7 +93,7 @@ Response Body (failed)
 
 # Update Mahasiswa
 
-Endpoint : POST /mahasiswa/:NIM
+Endpoint : PATCH /mahasiswa/:NIM
 
 Headers :
 
