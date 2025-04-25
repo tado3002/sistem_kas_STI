@@ -140,7 +140,7 @@ Response body (Error)
 
 # Get Transaksi By ID
 
-Endpoint : GET /transaksi/1
+Endpoint : GET /transaksi/:id
 
 Response body (Success)
 
@@ -265,7 +265,7 @@ Response body (Error)
 
 # Update Transaksi
 
-Endpoint : PUT /transaksi/:id
+Endpoint : PATCH /transaksi/:id
 
 Headers:
 

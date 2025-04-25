@@ -67,7 +67,7 @@ Response Body (Failed)
 
 ## Update Users
 
-Endpoint : PUT /users/:NIM
+Endpoint : PATCH /users/:NIM
 
 Headers :
 

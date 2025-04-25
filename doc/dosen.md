@@ -81,7 +81,7 @@ Response Body (Failed)
 
 ## Update Dosen
 
-Endpoint : PUT /dosens/:id
+Endpoint : PATCH /dosens/:id
 
 Headers :
 
