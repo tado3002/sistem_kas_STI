@@ -1,13 +1,17 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsPositive, IsString } from 'class-validator';
+import { IsDate, IsInt, IsNotEmpty, Min } from 'class-validator';
 
 export class CreateTaskDto {
-  @IsPositive()
+  @IsNotEmpty()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   dosenId: number;
-  @IsString()
+  @IsNotEmpty()
   title: string;
-  @IsString()
+  @IsNotEmpty()
   description: string;
+  @IsNotEmpty()
   @Type(() => Date)
   @IsDate()
   deadline: Date;
