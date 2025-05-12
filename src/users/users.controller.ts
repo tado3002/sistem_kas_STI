@@ -28,11 +28,12 @@ import { Request } from 'express';
 import { User } from '@prisma/client';
 
 @Controller('users')
-@UseGuards(JwtAuthGuard, AdminGuard)
+@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @UseGuards(AdminGuard)
   @HttpCode(HttpStatus.OK)
   async findAll(): Promise<ApiResponse<UserResponse[]>> {
     const result = await this.usersService.findAll();
@@ -52,6 +53,7 @@ export class UsersController {
   }
 
   @Patch(':NIM')
+  @UseGuards(AdminGuard)
   async update(
     @Param(
       'NIM',
@@ -73,6 +75,7 @@ export class UsersController {
   }
 
   @Delete(':NIM')
+  @UseGuards(AdminGuard)
   async remove(
     @Param(
       'NIM',
