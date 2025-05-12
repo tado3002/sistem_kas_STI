@@ -1,0 +1,40 @@
+version: '3.9'
+name: Sistem Kelas NestJs
+services:
+  # mysql service
+  mysql:
+    image: mysql:8
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: user
+      MYSQL_PASSWORD: sekarep
+      MYSQL_DATABASE: sistem_kelas
+    ports:
+      - '3306:3306'
+    networks:
+      - nest_network
+
+  # nestjs service
+  nest-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest_sistemkelas_api
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: 'mysql://user:sekarep@mysql:3306/sistem_kelas'
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mysql
+    networks:
+      - nest_network
+    command: ['pnpm', 'run', 'start:dev']
+
+networks:
+  nest_network:
