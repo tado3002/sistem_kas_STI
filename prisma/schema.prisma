@@ -28,7 +28,7 @@ model Task {
   title       String
   description String
   deadline    DateTime
-  dosen       Dosen    @relation(fields: [dosenId], references: [id])
+  dosen       Dosen    @relation(fields: [dosenId], references: [id], onDelete: Cascade)
   dosenId     Int
   createdAt   DateTime @default(now())
 }
@@ -39,7 +39,7 @@ model User {
   password      String
   name          String
   role          Role      @default(user)
-  mahasiswa     Mahasiswa @relation(fields: [usernameByNIM, name], references: [NIM, name])
+  mahasiswa     Mahasiswa @relation(fields: [usernameByNIM, name], references: [NIM, name], onDelete: Cascade)
   createdAt     DateTime  @default(now())
   updateAt      DateTime  @updatedAt
 
@@ -71,7 +71,7 @@ model Transaksi {
   id            Int             @id @default(autoincrement())
   nama          String
   NIM_mahasiswa Int
-  mahasiswa     Mahasiswa       @relation(fields: [NIM_mahasiswa, nama], references: [NIM, name])
+  mahasiswa     Mahasiswa       @relation(fields: [NIM_mahasiswa, nama], references: [NIM, name], onDelete: Cascade)
   nominal       BigInt
   type          TransactionType //'pemasukan' atau 'pengeluaran'
   tanggal       DateTime        @default(now())
